@@ -11,3 +11,8 @@ def TrainTestSplit(u, d, train_portion=0.8):
     train_slice = slice(0, int(len(u)*train_portion))
     test_slice = slice(int(len(u)*train_portion),-1)
     return [u[train_slice], u[test_slice], d[train_slice], d[test_slice]]
+
+def z_scorer(system):
+    system -= system.mean()
+    system /= system.std()
+    return system
