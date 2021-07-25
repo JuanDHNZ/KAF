@@ -355,7 +355,7 @@ def kafSearch_MC(filterName,systemName,n_samples,trainSplit,MC_runs):
             
         elif systemName == "4.2":
             eta = [0.05, 0.1, 0.5, 0.9]
-            sigma = [1e-2, 1e-1, 0, 2, 4]
+            sigma = [1e-2, 1e-1, 0, 2,  4]
             epsilon = [1e-2, 1e-1, 1,2]
             
         params = [{'eta':et,'epsilon':ep, 'sigma':s } for et in eta for ep in epsilon for s in sigma]
