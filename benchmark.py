@@ -13,7 +13,7 @@ import pandas as pd
 def get_kaf_params(filename):
     param_path = "results/4.2/"
     params = pd.read_csv(param_path + filename)
-    best_params = params[params.tradeOff_dist == params.tradeOff_dist.min()].iloc[0]
+    best_params = params[params.CB_size == params.CB_size.min()].iloc[0]
     return best_params
 
 def MSE(y_true, y_pred):
