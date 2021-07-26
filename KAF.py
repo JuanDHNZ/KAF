@@ -1791,7 +1791,7 @@ class QKLMS_AMK:
                 self.A0 = np.eye(D)/self.sigma #Matriz de proyeccion
             elif self.A_init == "pca":
                 from sklearn.decomposition import PCA
-                pca = PCA(n_components=2).fit(u[:100,:])
+                pca = PCA(n_components=2, whiten=True).fit(u[:100,:])
                 self.A0 = pca.components_            
         
             start = 1
