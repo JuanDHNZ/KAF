@@ -1,0 +1,3 @@
+Running Grid Search on 4.2_AKB system
+
+python KAF_GridSearch.py --kaf "QKLMS" --dataset 4.2_AKB -samples 5003 --savepath results/4.2/New/
