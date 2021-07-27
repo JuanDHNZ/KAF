@@ -1767,8 +1767,8 @@ class QKLMS_AMK:
         self.A_init = A_init
         self.scoring = False
         
-    def evaluate(self, X , y):        
-        u,d = self.embedder(X,y)        
+    def evaluate(self, u , d):        
+        # u,d = self.embedder(X,y)        
         import numpy as np
         if len(u.shape) == 2:
             if u.shape[0]!=d.shape[0]:
@@ -1926,7 +1926,7 @@ class QKLMS_AMK:
         return
     
     def predict(self,X):
-        X = self.embedder(X)
+        # X = self.embedder(X)
         from scipy.spatial.distance import cdist
         import numpy as np
         y = []
