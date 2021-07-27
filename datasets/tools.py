@@ -7,6 +7,17 @@ def Embedder(X, embedding = 2):
     d = np.array([X[i] for i in range(embedding,len(X))]).reshape(-1,1)
     return u,d
 
+def mc_sampler(X, n_samples, mc_runs, embedding = 2):
+    X = X.tolist()
+    run_samples = n_samples + embedding + 1
+    X_mc = []
+    for run in range(mc_runs):
+        run_slice = slice(0, run_samples)
+        X_mc.append(X[run_slice])
+        X = X[run_samples:]
+    return np.array(X_mc)
+    
+
 def TrainTestSplit(u, d, train_portion=0.8):
     train_slice = slice(0, int(len(u)*train_portion))
     test_slice = slice(int(len(u)*train_portion),-1)
@@ -68,6 +79,10 @@ def KAF_picker(filt, params):
         return kaf_filt
     except: 
         raise ValueError("Filter definition for {} failed".format(filt))
+        
+def best_params_picker(filt, params_df, criteria='TMSE'):
+    best_params = params_df[params_df[criteria] == params_df[criteria].min()]
+    return
 
 def tradeOff(TMSE,CB):
     from scipy.spatial.distance import cdist
