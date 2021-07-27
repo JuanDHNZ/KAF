@@ -17,25 +17,55 @@ def z_scorer(system):
     system /= system.std()
     return system
 
+def grid_picker(kaf):
+    try:
+        grids = {
+            "QKLMS" : {
+                "eta":[0.05, 0.1, 0.2],
+                "epsilon":[0.35, 0.5, 1],
+                "sigma": [0.2, 0.4, 0.6]
+            },
+            "QKLMS_AKB": {
+                "eta":[0.05, 0.1, 0.2],
+                "epsilon":[0.35, 0.5, 1],
+                "sigma_init": [0.2, 0.4, 0.6],
+                "mu":[0.05, 0.1, 0.2 , 0.3, 0.4],
+                "K":[1,2,4,6,8]
+            },
+            "QKLMS_AMK": {
+                "eta":[0.05, 0.1, 0.2],
+                "epsilon":[0.35, 0.5, 1],
+                "mu":[0.05, 0.1, 0.2 , 0.3, 0.4],
+                "K":[1,2,4,6,8]
+            }
+        }
+        return grids[kaf]
+    except:
+        raise ValueError("Grid definition for {} failed".format(kaf))
+
 def parameter_picker(filt, grid):
     try:
-        params = {
-            "QKLMS" : [{'eta':et,'epsilon':ep, 'sigma':s } for et in grid['eta'] for ep in grid['epsilon'] for s in grid['sigma']],
-            "QKLMS_AKB": [{'eta':et,'epsilon':ep, 'sigma_init':s, 'mu':m, 'K':int(k)} for et in grid['eta'] for ep in grid['epsilon'] for s in grid['sigma'] for m in grid['mu'] for k in grid['K']],
-            "QKLMS_AMK": [{'eta':et,'epsilon':ep, 'mu':m, 'K':int(k)} for et in grid['eta'] for ep in grid['epsilon'] for m in grid['mu'] for k in grid['K']]
-        }
+        if filt == "QKLMS":
+            params = [{'eta':et,'epsilon':ep, 'sigma':s } for et in grid['eta'] for ep in grid['epsilon'] for s in grid['sigma']]
+        elif filt == "QKLMS_AKB": 
+            params = [{'eta':et,'epsilon':ep, 'sigma_init':s, 'mu':m, 'K':int(k)} for et in grid['eta'] for ep in grid['epsilon'] for s in grid['sigma_init'] for m in grid['mu'] for k in grid['K']]
+        elif filt == "QKLMS_AMK": 
+            params = [{'eta':et,'epsilon':ep, 'mu':m, 'K':int(k)} for et in grid['eta'] for ep in grid['epsilon'] for m in grid['mu'] for k in grid['K']]
+        return params
     except:
         raise ValueError("Parameter asignation for {} failed".format(filt))
-    return params[filt]
+    
     
 def KAF_picker(filt, params):
     try:
         import KAF
-        filers = {
-            "QKLMS":KAF.QKLMS(eta=params['eta'],epsilon=params['epsilon'],sigma=params['sigma']),
-            "QKLMS_AKB":KAF.QKLMS_AKB(eta=params['eta'],epsilon=params['epsilon'],sigma_init=params['sigma_init'], mu=params['mu'], K=params['K']),
-            "QKLMS_AMK":KAF.QKLMS_AMK(eta=params['eta'],epsilon=params['epsilon'], mu=params['mu'], Ka=params['K'], A_init="pca")
-        }
+        if filt == "QKLMS":
+            kaf_filt = KAF.QKLMS(eta=params['eta'],epsilon=params['epsilon'],sigma=params['sigma'])
+        elif filt == "QKLMS_AKB":
+            kaf_filt = KAF.QKLMS_AKB(eta=params['eta'],epsilon=params['epsilon'],sigma_init=params['sigma_init'], mu=params['mu'], K=params['K'])
+        elif filt == "QKLMS_AMK":
+            kaf_filt = KAF.QKLMS_AMK(eta=params['eta'],epsilon=params['epsilon'], mu=params['mu'], Ka=params['K'], A_init="pca")
+        return kaf_filt
     except: 
         raise ValueError("Filter definition for {} failed".format(filt))
 

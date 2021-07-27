@@ -15,16 +15,13 @@ from sklearn.metrics import mean_squared_error
 attractors = ["chua","lorenz","duffing","nose_hoover","rikitake","rossler","wang"]
 nonlinears = ["4.1_AKB", "4.2_AKB"]
 
-def GridSearchKAF(filt, grid, testingSystem, n_samples,MC_runs):
-    n_samples = 5003
-    testingSystem = "4.2_AKB"
-    filt = "QKLMS"
+def GridSearchKAF(filt, grid, testingSystem, n_samples, savepath):
     # 1. data generation
     if testingSystem in attractors:
-        
+        print("In progress...")
     elif testingSystem in nonlinears:
         system = GenerateSystem(samples=n_samples, systemType=testingSystem)
-        system = tools.z_scorer(system)
+        system = z_scorer(system)
     else:
         raise ValueError("{} dataset is not supported".format(testingSystem))
 
@@ -37,31 +34,31 @@ def GridSearchKAF(filt, grid, testingSystem, n_samples,MC_runs):
     
     # 4. grid evaluation
     results = []
-    for params in tqdm(grid):
+    for p in tqdm(params):
         try:
-            f = KAF_picker(filt, params)
+            f = KAF_picker(filt, p)
             y = f.evaluate(Xtrain,ytrain)
             ypred = f.predict(Xtest)
             err = ytest-ypred.reshape(-1,1)
             p['TMSE'] = np.mean(err**2)
             p['CB'] = len(f.CB)
-            p['tradeOff'] = tradeOff(p['TMSE'],p['CB']/n_train)
+            p['tradeOff'] = tradeOff(p['TMSE'],p['CB']/len(Xtrain))
         except:
             p['TMSE'] = np.nan
             p['CB'] = np.nan
             p['tradeOff'] = np.nan
         results.append(p)
-        pd.DataFrame(data=results).to_csv(savename)
+        pd.DataFrame(data=results).to_csv(savepath + "{}_{}_{}.csv".format(filt,testingSystem,n_samples))
     return
 
 
-def GridSearchKAF_MC(filt, grid, testingSystem, n_samples,MC_runs):
+def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, savepath):
     n_samples = 5003
     testingSystem = "4.2_AKB"
     filt = "QKLMS"
     # 1. data generation
     if testingSystem in attractors:
-        
+        print("In progress...")
     elif testingSystem in nonlinears:
         system = GenerateSystem(samples=n_samples, systemType=testingSystem)
         system = tools.z_scorer(system)
@@ -91,6 +88,6 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples,MC_runs):
             p['CB'] = np.nan
             p['tradeOff'] = np.nan
         results.append(p)
-        pd.DataFrame(data=results).to_csv(savename)
+        pd.DataFrame(data=results).to_csv(savepath)
     return
 
