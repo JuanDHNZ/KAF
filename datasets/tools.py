@@ -82,7 +82,25 @@ def KAF_picker(filt, params):
         
 def best_params_picker(filt, params_df, criteria='TMSE'):
     best_params = params_df[params_df[criteria] == params_df[criteria].min()]
-    return
+    
+    import KAF
+    if filt == "QKLMS":
+        bps = {'eta':best_params.eta.values[0],
+               'epsilon':best_params.epsilon.values[0],
+               'sigma':best_params.sigma.values[0]}
+        
+    elif filt == "QKLMS_AKB":
+        bps = {'eta':best_params.eta.values[0],
+               'epsilon':best_params.epsilon.values[0],
+               'sigma_init':best_params.sigma_init.values[0], 
+               'mu':best_params.mu.values[0], 
+               'K':best_params.K.values[0]}
+    elif filt == "QKLMS_AMK":
+        bps = {'eta':best_params.eta.values[0],
+               'epsilon':best_params.epsilon.values[0],
+               'mu':best_params.mu.values[0],
+               'Ka':best_params.K.values[0], 'A_init':"pca"}
+    return bps
 
 def tradeOff(TMSE,CB):
     from scipy.spatial.distance import cdist
