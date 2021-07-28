@@ -51,9 +51,12 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         
         TMSE = []
         CB = []
+        
+        if kaf == "QKLMS_AMK":
+            f.evaluate(Xtrain[:100],ytrain[:100])
 
         for n,(Xi,yi) in tqdm(enumerate(zip(Xtrain,ytrain))):
-            
+        
             try:
                 y = f.evaluate(Xi,yi)
                 if np.mod(n,pred_step)==0:
