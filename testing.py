@@ -77,5 +77,5 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
     results = pd.concat([all_cb,all_tmse], axis=1)
     results['mean_CB'] = all_cb.mean(axis=1).values
     results['mean_TMSE'] = all_tmse.mean(axis=1).values
-    results.to_csv(savepath + "tmse_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
+    results.to_csv(savepath + "cb_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
     return
