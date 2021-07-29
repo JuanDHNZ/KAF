@@ -39,9 +39,11 @@ savepath = args.savepath
 # params_file = "results/4.2/New/QKLMS_4.2_AKB_5003.csv"
 # mc_runs = 5
 # pred_step = 10
+
 #%%
 def main():   
     from testing import LearningCurveKAF_MC
+    print("Learning Curve Carlculation...")
     LearningCurveKAF_MC(filt=kaf, 
                         testingSystem=dataset,
                         n_samples=samples, 

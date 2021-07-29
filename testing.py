@@ -21,6 +21,7 @@ nonlinears = ["4.1_AKB", "4.2_AKB"]
 
 def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, params_file, savepath):
     # 1. data generation
+    print("Generating data...")
     mc_samples = n_samples*(mc_runs + 1)
     if testingSystem in attractors:
         print("In progress...")
@@ -32,6 +33,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         raise ValueError("{} dataset is not supported".format(testingSystem))
     
     # 2. data preparation
+    print("Data preparation...")
     system_mc =  mc_sampler(system, n_samples, mc_runs)
     
     # 3. parameter grid
@@ -41,6 +43,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
     results_tmse = []     
     results_cb= []                                      
     # 4. Monte Carlo simulations
+    print("Evualuations...")
     for run, X_mc in enumerate(system_mc):
         print("\nRunning Monte Carlo simulation #{}...\n".format(run+1))    
         
@@ -52,11 +55,10 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         TMSE = []
         CB = []
         
-        if kaf == "QKLMS_AMK":
+        if filt == "QKLMS_AMK":
             f.evaluate(Xtrain[:100],ytrain[:100])
 
         for n,(Xi,yi) in tqdm(enumerate(zip(Xtrain,ytrain))):
-        
             try:
                 y = f.evaluate(Xi,yi)
                 if np.mod(n,pred_step)==0:
@@ -82,3 +84,50 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
     results['mean_TMSE'] = all_tmse.mean(axis=1).values
     results.to_csv(savepath + "cb_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
     return
+
+def CB_visualizer(testingSystem, n_samples, params_file):
+    # 1. Data generation
+    print("Data generation...")
+    if testingSystem in attractors:
+        print("In progress...")
+        return
+    elif testingSystem in nonlinears:
+        system = GenerateSystem(samples=n_samples, systemType=testingSystem)
+        system = z_scorer(system)
+    else:
+        raise ValueError("{} dataset is not supported".format(testingSystem)) 
+    
+    # 2. Data Preparation
+    print("Data preparation...")
+    X,y = Embedder(X=system, embedding=2)
+    Xtrain, Xtest, ytrain, ytest = TrainTestSplit(X,y)
+
+    # 3. Parameter selection 
+    print("Parameter selection ...")
+    filt = "QKLMS_AMK"
+    params_df = pd.read_csv(params_file)
+    params = best_params_picker(filt, params_df, "CB")
+    
+    # 4. Evaluation and Plotting
+    f = KAF_picker(filt, params)
+        
+    TMSE = []
+    CB = []
+    
+    # 4.1. Intialize
+    f.evaluate(Xtrain[:100],ytrain[:100])
+    # 4.2. Evaluate
+    for Xi,yi in tqdm(zip(Xtrain,ytrain)):
+        try:
+            y = f.evaluate(Xi,yi)
+            ypred = f.predict(Xtest)
+            err = ytest-ypred.reshape(-1,1)
+            TMSE.append(np.mean(err**2))
+            CB.append(len(f.CB))
+            plotCB(f)
+        except:
+            TMSE.append(np.nan)
+            CB.append(np.nan)        
+
+    return f
+    

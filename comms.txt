@@ -15,3 +15,13 @@ python KAF_GridSearch.py --kaf "QKLMS" --dataset 4.2_AKB -samples 5003 -mc_runs 
 python KAF_GridSearch.py --kaf "QKLMS_AKB" --dataset 4.2_AKB -samples 5003 --savepath results/4.2/New/
 
 python KAF_GridSearch.py --kaf "QKLMS_AMK" --dataset 4.2_AKB -samples 5003 --savepath results/4.2/New/
+
+
+
+TESTING MSE
+
+python KAF_LearningCurves.py --kaf "QKLMS" --dataset 4.2_AKB -samples 5003 -mc_runs 50 -pred_step 10 --params_file "results/4.2/New/mc_QKLMS_4.2_AKB_5003.csv" --savepath results/4.2/New/learning_curves/
+
+python KAF_LearningCurves.py --kaf "QKLMS_AKB" --dataset 4.2_AKB -samples 5003 -mc_runs 50 -pred_step 10 --params_file "results/4.2/New/mc_QKLMS_AKB_4.2_AKB_5003.csv" --savepath results/4.2/New/learning_curves/
+
+python KAF_LearningCurves.py --kaf "QKLMS_AMK" --dataset 4.2_AKB -samples 5003 -mc_runs 50 -pred_step 10 --params_file "results/4.2/New/mc_QKLMS_AMK_4.2_AKB_5003.csv" --savepath results/4.2/New/learning_curves/
