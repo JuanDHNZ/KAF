@@ -1764,6 +1764,7 @@ class QKLMS_AMK:
         self.a_coef = [] #Coeficientes
         self.CB_growth = [] #Crecimiento del codebook por iteracion
         self.initialize = True #Bandera de inicializacion 
+        self.At = []
         self.A_init = A_init
         self.scoring = False
         
@@ -1794,22 +1795,17 @@ class QKLMS_AMK:
                 pca = PCA(n_components=2, whiten=True).fit(u[:100,:])
                 self.A0 = pca.components_            
         
-            start = 1
-            self.Ak.append(self.A0)
-            self.A = self.A0
+            self.Ak.append(self.A0.copy())
+            self.A = self.A0.copy()
+            self.At.append(self.A.copy())
             self.initialize = False
             # err = 0.1
             y.append(0)
-        else:
-            start = 0
+            return
          
-        from sklearn.metrics import mean_squared_error
-        yt = []
-        self.mse = []
-        self.mse_ins = []
         from tqdm import tqdm
         #for i in tqdm(range(start,len(u))):
-        for i in range(start,len(u)):
+        for i in range(len(u)):
             ui = u[i]
             di = d[i]
             yi,dis,K = self.output(ui.reshape(-1,D) ) #Salida             
@@ -1837,7 +1833,8 @@ class QKLMS_AMK:
                         self.Ak[i] -= self.mu*(da/nda)*na                                                          
                 else:
                     self.Ak.append(self.A0.copy())
-            
+                # self.A = self.Ak[-1].copy()
+                self.At.append(self.A.copy())
                 self.CB.append(ui)
                 #self.a_coef.append(self.eta*e)                 
                 self.a_coef = np.hstack((self.a_coef,self.eta*e))
