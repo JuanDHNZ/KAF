@@ -118,8 +118,8 @@ def tradeOff(TMSE,CB):
 
 def plotCB(model,X): 
     means = np.array(model.CB)
-    covs = np.array(model.At)
-    
+    covs = [np.linalg.inv(np.dot(A.T,A)) for A in model.At]
+
     fig, ax = plt.subplots()
     ax.scatter(means[:, 0], means[:, 1], s=40, color='red', marker="X", label="CB_centroid")
     ax.scatter(X[:, 0], X[:, 1], s=20, color='blue', marker="*", label="Samples")
@@ -127,7 +127,7 @@ def plotCB(model,X):
     plt.xlim([-6,6])
     # # plot_gmm(gmm, u)
     for mean, cov in zip(means, covs):
-        confidence_ellipse(cov=cov, mean=mean.reshape(-1,1), ax=ax, n_std=2, edgecolor='red')
+        confidence_ellipse(cov=cov, mean=mean.reshape(-1,1), ax=ax, n_std=1, edgecolor='red')
     plt.legend()
     plt.show()
     return
