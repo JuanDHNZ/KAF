@@ -1798,6 +1798,7 @@ class QKLMS_AMK:
             self.Ak.append(self.A0.copy())
             self.A = self.A0.copy()
             self.At.append(self.A.copy())
+            
             self.initialize = False
             # err = 0.1
             y.append(0)
@@ -1833,8 +1834,10 @@ class QKLMS_AMK:
                         self.Ak[i] -= self.mu*(da/nda)*na                                                          
                 else:
                     self.Ak.append(self.A0.copy())
-                # self.A = self.Ak[-1].copy()
+                    
+                self.A = self.Ak[-1].copy()
                 self.At.append(self.A.copy())
+                
                 self.CB.append(ui)
                 #self.a_coef.append(self.eta*e)                 
                 self.a_coef = np.hstack((self.a_coef,self.eta*e))
