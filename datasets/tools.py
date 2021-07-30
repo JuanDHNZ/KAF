@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 from matplotlib.patches import Ellipse
 from matplotlib.transforms import Affine2D
+import matplotlib as mpl
+mpl.rcParams['figure.dpi'] = 300
 
 """
 Make the embedding for KAF processing
@@ -114,23 +116,19 @@ def tradeOff(TMSE,CB):
     result = np.array([TMSE,CB]).reshape(1,-1)
     return cdist(reference,result).item()
 
-def plotCB(model): 
+def plotCB(model,X): 
     means = np.array(model.CB)
     covs = np.array(model.At)
     
-    print(means.shape)
-    print(covs.shape)
-    print('\n')
-    
     fig, ax = plt.subplots()
-    ax.scatter(means[:, 0], means[:, 1], s=40, cmap='viridis', marker="x", label="CB_centroid")
-    # plt.ylim([-30,50])
-    # plt.xlim([-30,30])
+    ax.scatter(means[:, 0], means[:, 1], s=40, color='red', marker="X", label="CB_centroid")
+    ax.scatter(X[:, 0], X[:, 1], s=20, color='blue', marker="*", label="Samples")
+    plt.ylim([-6,6])
+    plt.xlim([-6,6])
     # # plot_gmm(gmm, u)
     for mean, cov in zip(means, covs):
-        confidence_ellipse(cov=cov, mean=mean.reshape(-1,1), ax=ax, n_std=3, edgecolor='red')
-    # plt.scatter(gmm.means_[:,0], gmm.means_[:,1], color="magenta", marker="x", label="means")
-    # plt.legend()
+        confidence_ellipse(cov=cov, mean=mean.reshape(-1,1), ax=ax, n_std=2, edgecolor='red')
+    plt.legend()
     plt.show()
     return
 

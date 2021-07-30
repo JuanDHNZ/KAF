@@ -113,21 +113,21 @@ def CB_visualizer(testingSystem, n_samples, params_file):
         
     TMSE = []
     CB = []
-    
+    X_eval = []
     # 4.1. Intialize
     f.evaluate(Xtrain[:100],ytrain[:100])
     # 4.2. Evaluate
     for Xi,yi in tqdm(zip(Xtrain,ytrain)):
         try:
             y = f.evaluate(Xi,yi)
+            X_eval.append(Xi)
             ypred = f.predict(Xtest)
             err = ytest-ypred.reshape(-1,1)
             TMSE.append(np.mean(err**2))
             CB.append(len(f.CB))
-            plotCB(f)
+            plotCB(f,np.array(X_eval))
         except:
             TMSE.append(np.nan)
             CB.append(np.nan)        
-
     return f
     
