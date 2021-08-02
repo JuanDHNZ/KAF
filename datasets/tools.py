@@ -125,6 +125,7 @@ def plotCB(model,X):
     ax.scatter(X[:, 0], X[:, 1], s=20, color='blue', marker="*", label="Samples")
     plt.ylim([-6,6])
     plt.xlim([-6,6])
+    plt.title("CB = {}".format(len(model.CB)))
     # # plot_gmm(gmm, u)
     for mean, cov in zip(means, covs):
         confidence_ellipse(cov=cov, mean=mean.reshape(-1,1), ax=ax, n_std=1, edgecolor='red')

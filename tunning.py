@@ -84,6 +84,8 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, savepath):
         for p in tqdm(params):
             try:
                 f = KAF_picker(filt, p)
+                if filt == "QKLMS_AMK":
+                    f.evaluate(Xtrain[:100],ytrain[:100])
                 y = f.evaluate(Xtrain,ytrain)
                 ypred = f.predict(Xtest)
                 err = ytest-ypred.reshape(-1,1)
