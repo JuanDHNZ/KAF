@@ -38,8 +38,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
     
     # 3. parameter grid
     params_df = pd.read_csv(params_file)
-    params = best_params_picker(filt, params_df) #pendiente -> retorna un diccionario con 
-                                                          #los params de cada filtro
+    params = best_params_picker(filt, params_df) 
     results_tmse = []     
     results_cb= []                                      
     # 4. Monte Carlo simulations
@@ -82,7 +81,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
     results = pd.concat([all_cb,all_tmse], axis=1)
     results['mean_CB'] = all_cb.mean(axis=1).values
     results['mean_TMSE'] = all_tmse.mean(axis=1).values
-    results.to_csv(savepath + "cb_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
+    results.to_csv(savepath + "cb2_{}_{}_{}_K_8.csv".format(filt,testingSystem,n_samples))
     return
 
 def CB_visualizer(testingSystem, n_samples, params_file):
@@ -125,9 +124,10 @@ def CB_visualizer(testingSystem, n_samples, params_file):
             err = ytest-ypred.reshape(-1,1)
             TMSE.append(np.mean(err**2))
             CB.append(len(f.CB))
-            plotCB(f,np.array(X_eval))
+            # plotCB(f,np.array(X_eval))
         except:
             TMSE.append(np.nan)
-            CB.append(np.nan)        
+            CB.append(np.nan)   
+    plotCB(f,np.array(X_eval))
     return f
     

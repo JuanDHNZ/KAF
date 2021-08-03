@@ -87,7 +87,7 @@ def KAF_picker(filt, params):
     except: 
         raise ValueError("Filter definition for {} failed".format(filt))
         
-def best_params_picker(filt, params_df, criteria='TMSE'):
+def best_params_picker(filt, params_df, criteria='CB'): # CHANGE CRITERIA FOR TMSE CURVE
     best_params = params_df[params_df[criteria] == params_df[criteria].min()]
     
     import KAF
@@ -103,10 +103,14 @@ def best_params_picker(filt, params_df, criteria='TMSE'):
                'mu':best_params.mu.values[0], 
                'K':best_params.K.values[0]}
     elif filt == "QKLMS_AMK":
+        # bps = {'eta':best_params.eta.values[0],
+        #        'epsilon':best_params.epsilon.values[0],
+        #        'mu':best_params.mu.values[0],
+        #        'K':best_params.K.values[0], 'A_init':"pca"}
         bps = {'eta':best_params.eta.values[0],
                'epsilon':best_params.epsilon.values[0],
                'mu':best_params.mu.values[0],
-               'K':best_params.K.values[0], 'A_init':"pca"}
+               'K':8}
     return bps
 
 def tradeOff(TMSE,CB):
@@ -162,4 +166,7 @@ def confidence_ellipse(cov, mean, ax, n_std=3.0, facecolor='none', edgecolor='no
         .translate(mean_x, mean_y)
 
     ellipse.set_transform(transf + ax.transData)
+    plt.savefig('CB_plot.png', dpi=300)
+    import tikzplotlib
+    tikzplotlib.save('CB_plot.tex')
     return ax.add_patch(ellipse)
