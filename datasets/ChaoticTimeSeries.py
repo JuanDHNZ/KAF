@@ -7,6 +7,7 @@ Created on Tue Jun 30 11:51:26 2020
 Atractores obtenidos del repositorio https://github.com/capitanov/chaospy
 """
 import numpy as np
+import matplotlib.pyplot as plt
 
 def chua(x=0, y=0, z=1, **kwargs):
     """
@@ -218,10 +219,11 @@ def GenerateAttractor(samples = 1000, attractor = None, display=False):
     """    
     # Validations
     if attractor == None:
-        raise ValueError('System type is missing')
+        raise ValueError('Attractor type missing')
         
-    validKeys = attractors.keys()
-    if not attractor in validKeys:
+    validKeys = ["chua","lorenz","duffing","nose_hoover","rikitake","rossler","wang"]    
+    
+    if attractor not in validKeys:
         raise ValueError('Attractor does not exist or is not supported')
         
     # Assign generating function to attractors

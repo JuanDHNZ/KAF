@@ -16,7 +16,8 @@ nonlinears = ["4.1_AKB", "4.2_AKB"]
 def GridSearchKAF(filt, grid, testingSystem, n_samples, savepath):
     # 1. data generation
     if testingSystem in attractors:
-        print("In progress...")
+        x,y,z = GenerateAttractor(samples=n_samples, attractor=testingSystem)
+        system = z_scorer(x)
         return
     elif testingSystem in nonlinears:
         system = GenerateSystem(samples=n_samples, systemType=testingSystem)
@@ -55,7 +56,8 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, savepath):
     # 1. data generation
     mc_samples = n_samples*(mc_runs + 1)
     if testingSystem in attractors:
-        print("In progress...")
+        x,y,z = GenerateAttractor(samples=n_samples, attractor=testingSystem)
+        system = z_scorer(x)
         return
     elif testingSystem in nonlinears:
         system = GenerateSystem(samples=mc_samples, systemType=testingSystem)
