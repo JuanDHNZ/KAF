@@ -84,7 +84,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
     results.to_csv(savepath + "cb2_{}_{}_{}_K_8.csv".format(filt,testingSystem,n_samples))
     return
 
-def CB_visualizer(testingSystem, n_samples, params_file):
+def CB_visualizer(testingSystem, n_samples, params_file, savename):
     # 1. Data generation
     print("Data generation...")
     if testingSystem in attractors:
@@ -128,6 +128,6 @@ def CB_visualizer(testingSystem, n_samples, params_file):
         except:
             TMSE.append(np.nan)
             CB.append(np.nan)   
-    plotCB(f,np.array(X_eval))
+    plotCB(f,np.array(X_eval), savename)
     return f
     

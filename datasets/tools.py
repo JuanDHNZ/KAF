@@ -4,7 +4,9 @@ import seaborn as sns; sns.set()
 from matplotlib.patches import Ellipse
 from matplotlib.transforms import Affine2D
 import matplotlib as mpl
+import tikzplotlib
 mpl.rcParams['figure.dpi'] = 300
+from .. import KAF
 
 """
 Make the embedding for KAF processing
@@ -76,7 +78,6 @@ def parameter_picker(filt, grid):
     
 def KAF_picker(filt, params):
     try:
-        import KAF
         if filt == "QKLMS":
             kaf_filt = KAF.QKLMS(eta=params['eta'],epsilon=params['epsilon'],sigma=params['sigma'])
         elif filt == "QKLMS_AKB":
@@ -90,7 +91,7 @@ def KAF_picker(filt, params):
 def best_params_picker(filt, params_df, criteria='CB'): # CHANGE CRITERIA FOR TMSE CURVE
     best_params = params_df[params_df[criteria] == params_df[criteria].min()]
     
-    import KAF
+    
     if filt == "QKLMS":
         bps = {'eta':best_params.eta.values[0],
                'epsilon':best_params.epsilon.values[0],
@@ -103,14 +104,14 @@ def best_params_picker(filt, params_df, criteria='CB'): # CHANGE CRITERIA FOR TM
                'mu':best_params.mu.values[0], 
                'K':best_params.K.values[0]}
     elif filt == "QKLMS_AMK":
+        bps = {'eta':best_params.eta.values[0],
+                'epsilon':best_params.epsilon.values[0],
+                'mu':best_params.mu.values[0],
+                'K':best_params.K.values[0], 'A_init':"pca"}
         # bps = {'eta':best_params.eta.values[0],
         #        'epsilon':best_params.epsilon.values[0],
         #        'mu':best_params.mu.values[0],
-        #        'K':best_params.K.values[0], 'A_init':"pca"}
-        bps = {'eta':best_params.eta.values[0],
-               'epsilon':best_params.epsilon.values[0],
-               'mu':best_params.mu.values[0],
-               'K':8}
+        #        'K':best_params.K.values[0]}
     return bps
 
 def tradeOff(TMSE,CB):
@@ -120,13 +121,13 @@ def tradeOff(TMSE,CB):
     result = np.array([TMSE,CB]).reshape(1,-1)
     return cdist(reference,result).item()
 
-def plotCB(model,X): 
+def plotCB(model,X,savename="test"): 
     means = np.array(model.CB)
     covs = [np.linalg.inv(np.dot(A.T,A)) for A in model.At]
 
     fig, ax = plt.subplots()
-    ax.scatter(means[:, 0], means[:, 1], s=40, color='red', marker="X", label="CB_centroid")
-    ax.scatter(X[:, 0], X[:, 1], s=20, color='blue', marker="*", label="Samples")
+    ax.scatter(means[:, 0], means[:, 1], s=20, color='red', marker="X", label="CB_centroid")
+    ax.scatter(X[:, 0], X[:, 1], s=10, color='blue', marker="x", label="Samples")
     plt.ylim([-6,6])
     plt.xlim([-6,6])
     plt.title("CB = {}".format(len(model.CB)))
@@ -134,6 +135,9 @@ def plotCB(model,X):
     for mean, cov in zip(means, covs):
         confidence_ellipse(cov=cov, mean=mean.reshape(-1,1), ax=ax, n_std=1, edgecolor='red')
     plt.legend()
+    folder = "Graficos/CB/"
+    plt.savefig(folder + '{}.png'.format(savename), dpi=300)
+    tikzplotlib.save(folder + 'tex/{}.tex'.format(savename))
     plt.show()
     return
 
@@ -166,7 +170,5 @@ def confidence_ellipse(cov, mean, ax, n_std=3.0, facecolor='none', edgecolor='no
         .translate(mean_x, mean_y)
 
     ellipse.set_transform(transf + ax.transData)
-    plt.savefig('CB_plot.png', dpi=300)
-    import tikzplotlib
-    tikzplotlib.save('CB_plot.tex')
+    
     return ax.add_patch(ellipse)

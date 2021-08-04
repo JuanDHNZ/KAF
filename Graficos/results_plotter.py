@@ -5,18 +5,19 @@ import seaborn as sns
 import tikzplotlib
 sns.set()
 
-
-
-path = "../results/4.2/New/learning_curves/"
-
-
-#TMSE
+path = "../results/4.2/Learning_Curves/"
+folder = "TMSE/"
+#%% MSE based Learning Curve
+# Curves data
 filts = ["tmse_{}_4.2_AKB_5003.csv".format(fil) for fil in ["QKLMS","QKLMS_AKB", "QKLMS_AMK"]]
 QKLMS = pd.read_csv(path + filts[0])
 AKB = pd.read_csv(path + filts[1])
 AMK = pd.read_csv(path + filts[2])
+
+# TMSE plot
 plt.figure(figsize=(16,9))
 plt.yscale("log")
+plt.xscale("log")
 plt.ylim((1e-3,0.1e1))
 plt.ylabel("TMSE")
 plt.xlabel("iterations")
@@ -24,27 +25,33 @@ plt.plot(np.linspace(0,4000,len(QKLMS.mean_TMSE)),QKLMS.mean_TMSE, color="m",lab
 plt.plot(np.linspace(0,4000,len(AKB.mean_TMSE)),AKB.mean_TMSE, color="c",label="QKLMS_AKB", lw=2, marker="8", ms=10,markevery=10)
 plt.plot(np.linspace(0,4000,len(AMK.mean_TMSE)),AMK.mean_TMSE, color="tab:orange",label="QKLMS_AMK", lw=2, marker=9, ms=10,markevery=10)
 plt.legend()
-plt.savefig('TMSE_minMSE.png', dpi=300)
-tikzplotlib.save('TMSE_minMSE.tex')
+savename = 'TMSE_minMSE_log'
+plt.savefig(folder + '{}.png'.format(savename), dpi=300)
+tikzplotlib.save(folder + 'tex/{}.tex'.format(savename))
 plt.show()
 
+# CB plot
 plt.figure(figsize=(16,9))
-# plt.yscale("log")
+plt.yscale("log")
+plt.ylim((1,1e1))
+plt.xscale("log")
 plt.ylabel("CB")
 plt.xlabel("iterations")
 plt.plot(np.linspace(0,4000,len(QKLMS.mean_CB)),QKLMS.mean_CB, color="m",label="QKLMS", lw=2, marker="*", ms=10,markevery=10)
 plt.plot(np.linspace(0,4000,len(AKB.mean_CB)),AKB.mean_CB, color="c",label="QKLMS_AKB", lw=2, marker="8", ms=10,markevery=10)
 plt.plot(np.linspace(0,4000,len(AMK.mean_CB)),AMK.mean_CB, color="tab:orange",label="QKLMS_AMK", lw=2, marker=9, ms=10,markevery=10)
 plt.legend()
-plt.savefig('CB_minMSE.png', dpi=300)
-tikzplotlib.save('CB_minMSE.tex')
+
+savename = 'CB_minMSE_log'
+plt.savefig(folder + '{}.png'.format(savename), dpi=300)
+tikzplotlib.save(folder + 'tex/{}.tex'.format(savename))
 plt.show()
 
 
-
+#%% CB based Learning Curve
 
 #State of the art
-filts = ["tmse_{}_4.2_AKB_5003.csv".format(fil) for fil in ["QKLMS","QKLMS_AKB"]]
+filts = ["cb_{}_4.2_AKB_5003.csv".format(fil) for fil in ["QKLMS","QKLMS_AKB"]]
 QKLMS = pd.read_csv(path + filts[0])
 AKB = pd.read_csv(path + filts[1])
 
@@ -57,13 +64,10 @@ amk_k6 = pd.read_csv(path + amks[3])
 amk_k8 = pd.read_csv(path + amks[4])
 
 
-
-
-
-#%% Nonlinear system 4.2. New TMSE results for best CB criteria
-
+# TMSE
 plt.figure(figsize=(16,9))
 plt.yscale("log")
+plt.xscale("log")
 plt.ylim((0.5,0.1e1))
 plt.ylabel("TMSE")
 plt.xlabel("iterations")
@@ -75,15 +79,16 @@ plt.plot(np.linspace(0,4000,len(amk_k4.mean_TMSE)),amk_k4.mean_TMSE, color="tab:
 plt.plot(np.linspace(0,4000,len(amk_k6.mean_TMSE)),amk_k6.mean_TMSE, color="tab:green",label="Proposed K=6", lw=2, marker="X", ms=10,markevery=10)
 plt.plot(np.linspace(0,4000,len(amk_k8.mean_TMSE)),amk_k8.mean_TMSE, color="tab:orange",label="Proposed K=8", lw=2, marker=9, ms=10,markevery=10)
 plt.legend()
-plt.savefig('TMSE_minCB.png', dpi=300)
-tikzplotlib.save('TMSE_minCB.tex')
+
+savename = 'TMSE_minCB_log'
+plt.savefig(folder + '{}.png'.format(savename), dpi=300)
+tikzplotlib.save(folder + 'tex/{}.tex'.format(savename))
 plt.show()
 
-
-#%% Nonlinear system 4.2. New CB growth for best CB criteria
-
+# CB
 plt.figure(figsize=(16,9))
-# plt.yscale("log")
+plt.yscale("log")
+plt.xscale("log")
 plt.ylabel("CB")
 plt.xlabel("iterations")
 plt.plot(np.linspace(0,4000,len(QKLMS.mean_CB)),QKLMS.mean_CB, color="m",label="QKLMS", lw=2, marker="*", ms=10,markevery=10)
@@ -94,7 +99,10 @@ plt.plot(np.linspace(0,4000,len(amk_k4.mean_CB)),amk_k4.mean_CB, color="tab:pink
 plt.plot(np.linspace(0,4000,len(amk_k6.mean_CB)),amk_k6.mean_CB, color="tab:green",label="Proposed K=6", lw=2, marker="X", ms=10,markevery=10)
 plt.plot(np.linspace(0,4000,len(amk_k8.mean_CB)),amk_k8.mean_CB, color="tab:orange",label="Proposed K=8", lw=2, marker=9, ms=10,markevery=10)
 plt.legend()
-plt.savefig(path + 'CB_minCB.png', dpi=300)
-tikzplotlib.save(path + 'CB_minCB.tex')
+
+savename = 'CB_minCB_log'
+plt.savefig(folder + '{}.png'.format(savename), dpi=300)
+tikzplotlib.save(folder + 'tex/{}.tex'.format(savename))
 plt.show()
+
 
