@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../')
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
@@ -6,7 +8,7 @@ from matplotlib.transforms import Affine2D
 import matplotlib as mpl
 import tikzplotlib
 mpl.rcParams['figure.dpi'] = 300
-from .. import KAF
+import KAF
 
 """
 Make the embedding for KAF processing

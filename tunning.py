@@ -1,6 +1,7 @@
 import pandas as pd  
 import numpy as np
 from tqdm import tqdm
+import os
 
 # datasets
 from datasets.ChaoticTimeSeries import GenerateAttractor
@@ -52,13 +53,12 @@ def GridSearchKAF(filt, grid, testingSystem, n_samples, savepath):
     return
 
 
-def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, savepath):
+def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, embedding, savepath):
     # 1. data generation
     mc_samples = n_samples*(mc_runs + 1)
     if testingSystem in attractors:
-        x,y,z = GenerateAttractor(samples=n_samples, attractor=testingSystem)
+        x,y,z = GenerateAttractor(samples=mc_samples, attractor=testingSystem)
         system = z_scorer(x)
-        return
     elif testingSystem in nonlinears:
         system = GenerateSystem(samples=mc_samples, systemType=testingSystem)
         system = z_scorer(system)
@@ -79,10 +79,10 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, savepath):
     for run, X_mc in enumerate(system_mc):
         print("\nRunning Monte Carlo simulation #{}...\n".format(run+1))    
         
-        X,y = Embedder(X=X_mc, embedding=2)
+        X,y = Embedder(X=X_mc, embedding=embedding)
         Xtrain, Xtest, ytrain, ytest = TrainTestSplit(X,y)
     
-        results = []
+        partial_params = []
         for p in tqdm(params):
             try:
                 f = KAF_picker(filt, p)
@@ -93,12 +93,23 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, savepath):
                 err = ytest-ypred.reshape(-1,1)
                 TMSE.append(np.mean(err**2))
                 CB.append(len(f.CB))
-                # TradeOff.append(tradeOff(np.mean(err**2),len(f.CB)/len(Xtrain)))
+                
             except:
                 TMSE.append(np.nan)
                 CB.append(np.nan)
-                # TradeOff.append(np.nan)
+                
+        TMSE_partial = np.array(TMSE).reshape(run+1,-1)
+        CB_partial = np.array(CB).reshape(run+1,-1)
+        # TradeOff = np.array(TradeOff).reshape(mc_runs,-1)
         
+        mean_TMSE_partial = np.nanmean(TMSE_partial, axis=0)
+        mean_CB_partial = np.nanmean(CB_partial, axis=0)
+            
+        results_partial = [p for p in params]
+        results_df_partial = pd.DataFrame(data=results_partial)
+        results_df_partial['TMSE'] = mean_TMSE_partial
+        results_df_partial['CB'] = mean_CB_partial.astype(int)
+        results_df_partial.to_csv(savepath + "PARTIAL_mc_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
     TMSE = np.array(TMSE).reshape(mc_runs,-1)
     CB = np.array(CB).reshape(mc_runs,-1)
     # TradeOff = np.array(TradeOff).reshape(mc_runs,-1)
@@ -110,8 +121,13 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, savepath):
     results_df = pd.DataFrame(data=results)
     results_df['TMSE'] = mean_TMSE 
     results_df['CB'] = mean_CB.astype(int)
-    # results_df['tradeOff_dist'] = tradeOff_distance
-        
+    # remove partials CSV
+    partial_file = savepath + "PARTIAL_mc_{}_{}_{}.csv".format(filt,testingSystem,n_samples)
+    if(os.path.exists(partial_file) and os.path.isfile(partial_file)):
+        try:    
+            os.remove(partial_file)
+        except:
+            print("PARTIAL file not deleted.")
     results_df.to_csv(savepath + "mc_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
     return
 

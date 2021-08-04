@@ -4,16 +4,14 @@ Created on Tue Aug  3 14:14:56 2021
 
 @author: Juan David
 """
-
+import sys
+sys.path.append('../')
 from datasets.TestingSystems import GenerateSystem
 from datasets import tools
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 import tikzplotlib
-
-import sys
-sys.path.append('../')
 import KAF
 
 criteria = "CB"
