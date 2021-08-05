@@ -128,6 +128,6 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, embedding, s
             os.remove(partial_file)
         except:
             print("PARTIAL file not deleted.")
-    results_df.to_csv(savepath + "mc_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
+    results_df.to_csv(savepath + "NewEta_mc_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
     return
 
