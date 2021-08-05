@@ -67,7 +67,7 @@ amk_k8 = pd.read_csv(path + amks[4])
 # TMSE
 plt.figure(figsize=(16,9))
 plt.yscale("log")
-plt.xscale("log")
+# plt.xscale("log")
 plt.ylim((0.5,0.1e1))
 plt.ylabel("TMSE")
 plt.xlabel("iterations")

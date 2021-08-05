@@ -18,6 +18,7 @@ criteria = "CB"
 folder = "Predictions/"
 N = 100
 save = False
+plot_data = True
 #%% DATA GENERATION - 4.2 AKB nonlinear system
 
 system = GenerateSystem(samples=5003, systemType="4.2_AKB")
@@ -25,6 +26,14 @@ system = tools.z_scorer(system)
 
 X,y = tools.Embedder(X=system, embedding=2)
 Xtrain, Xtest, ytrain, ytest = tools.TrainTestSplit(X,y)
+
+if plot_data:
+    print(Xtrain.shape, ytrain.shape)
+    print(Xtest.shape, ytest.shape)
+    plt.plot(ytrain[:500], color="red")
+    plt.show()
+    plt.plot(ytest, color="blue")
+    plt.show()
 
 #%%QKLSM PREDICTION
 

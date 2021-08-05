@@ -55,7 +55,8 @@ def grid_picker(kaf):
                 "K":[1,2,4,6,8]
             },
             "QKLMS_AMK": {
-                "eta":[0.05, 0.1, 0.2],
+                # "eta":[0.05, 0.1, 0.2],
+                "eta":[0.3, 0.5, 0.9],
                 "epsilon":[0.35, 0.5, 1],
                 "mu":[0.05, 0.1, 0.2 , 0.3, 0.4],
                 "K":[1,2,4,6,8]
@@ -106,14 +107,14 @@ def best_params_picker(filt, params_df, criteria='CB'): # CHANGE CRITERIA FOR TM
                'mu':best_params.mu.values[0], 
                'K':best_params.K.values[0]}
     elif filt == "QKLMS_AMK":
+        # bps = {'eta':best_params.eta.values[0],
+        #         'epsilon':best_params.epsilon.values[0],
+        #         'mu':best_params.mu.values[0],
+        #         'K':best_params.K.values[0], 'A_init':"pca"}
         bps = {'eta':best_params.eta.values[0],
                 'epsilon':best_params.epsilon.values[0],
                 'mu':best_params.mu.values[0],
-                'K':best_params.K.values[0], 'A_init':"pca"}
-        # bps = {'eta':best_params.eta.values[0],
-        #        'epsilon':best_params.epsilon.values[0],
-        #        'mu':best_params.mu.values[0],
-        #        'K':best_params.K.values[0]}
+                'K':1}
     return bps
 
 def tradeOff(TMSE,CB):
