@@ -37,7 +37,7 @@ python KAF_GridSearch.py --kaf QKLMS_AMK --dataset 4.2_AKB -samples 5003 --savep
 
 TESTING MSE:
 
-python KAF_LearningCurves.py --kaf "QKLMS_AMK" --dataset 4.2_AKB -samples 5003 -mc_runs 50 -pred_step 10 --params_file "results/4.2/AMK_fixed/mc_QKLMS_AMK_4.2_AKB_5003.csv" --savepath results/4.2/Learning_Curves/
+python KAF_LearningCurves.py --kaf "QKLMS_AMK" --dataset 4.2_AKB -samples 5003 -mc_runs 50 -pred_step 10 --params_file "results/4.2/GridSearch_MonteCarlo/mc_QKLMS_AMK_4.2_AKB_5003.csv" --savepath results/4.2/Learning_Curves/
 
 
 
@@ -47,3 +47,36 @@ python KAF_LearningCurves.py --kaf "QKLMS_AMK" --dataset 4.2_AKB -samples 5003 -
 Running Monte Carlo Grid Search on Chua attractor
 
 python KAF_GridSearch.py --kaf "QKLMS" --dataset chua -samples 5003 -mc_runs 50 -embedding 5 --savepath results/Chua/ & python KAF_GridSearch.py --kaf "QKLMS_AKB" --dataset chua -samples 5003 -mc_runs 50 -embedding 5 --savepath results/Chua/ & python KAF_GridSearch.py --kaf "QKLMS_AMK" --dataset chua -samples 5003 -mc_runs 50 -embedding 5 --savepath results/Chua/
+
+
+1000
+
+python KAF_GridSearch.py --kaf "QKLMS" --dataset chua -samples 1003 -mc_runs 20 -embedding 5 --savepath results/Chua/split_1/
+
+python KAF_GridSearch.py --kaf "QKLMS_AKB" --dataset chua -samples 1003 -mc_runs 50 -embedding 5 --savepath results/Chua/split_1
+
+python KAF_GridSearch.py --kaf "QKLMS_AMK" --dataset chua -samples 1003 -mc_runs 20 -embedding 5 --savepath results/Chua/split_1/
+
+
+4000
+
+python KAF_GridSearch.py --kaf "QKLMS" --dataset chua -samples 4005 -mc_runs 20 -embedding 5 --savepath results/Chua/split_2/
+
+python KAF_GridSearch.py --kaf "QKLMS_AKB" --dataset chua -samples 4005 -mc_runs 20 -embedding 5 --savepath results/Chua/split_2/
+
+python KAF_GridSearch.py --kaf "QKLMS_AMK" --dataset chua -samples 4005 -mc_runs 20 -embedding 5 --savepath results/Chua/split_2/
+
+Testing MSE
+
+python KAF_LearningCurves.py --kaf "QKLMS" --dataset chua -samples 4005 -mc_runs 20 -pred_step 10 --params_file "results/Chua/split_2/mc_QKLMS_chua_4005.csv" --savepath results/Chua/learning_curves/ & python KAF_LearningCurves.py --kaf "QKLMS_AKB" --dataset chua -samples 4005 -mc_runs 20 -pred_step 10 --params_file "results/Chua/split_2/mc_QKLMS_AKB_chua_4005.csv" --savepath results/Chua/learning_curves/ & python KAF_LearningCurves.py --kaf "QKLMS_AMK" --dataset chua -samples 4005 -mc_runs 20 -pred_step 10 --params_file "results/Chua/split_2/mc_QKLMS_AMK_chua_4005.csv" --savepath  results/Chua/learning_curves/
+
+
+
+SPLIT 3 
+
+python KAF_GridSearch.py --kaf "QKLMS" --dataset chua -samples 4005 -mc_runs 30 -embedding 5 --savepath results/Chua/split_3/
+
+python KAF_GridSearch.py --kaf "QKLMS_AKB" --dataset chua -samples 1003 -mc_runs 50 -embedding 5 --savepath results/Chua/split_1
+
+python KAF_GridSearch.py --kaf "QKLMS_AMK" --dataset chua -samples 1003 -mc_runs 20 -embedding 5 --savepath results/Chua/split_1/
+

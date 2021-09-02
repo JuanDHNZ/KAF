@@ -9,6 +9,7 @@ import matplotlib as mpl
 import tikzplotlib
 mpl.rcParams['figure.dpi'] = 300
 import KAF
+from datasets.ChaoticTimeSeries import GenerateAttractor
 
 """
 Make the embedding for KAF processing
@@ -55,11 +56,15 @@ def grid_picker(kaf):
                 "K":[1,2,4,6,8]
             },
             "QKLMS_AMK": {
-                # "eta":[0.05, 0.1, 0.2],
+                "eta":[0.05, 0.1, 0.2],
                 "eta":[0.3, 0.5, 0.9],
                 "epsilon":[0.35, 0.5, 1],
                 "mu":[0.05, 0.1, 0.2 , 0.3, 0.4],
                 "K":[1,2,4,6,8]
+                # "eta":[0.5],
+                # "epsilon":[0.05, 0.1, 0.2],
+                # "mu":[0.0001, 0.0005, 0.001],
+                # "K":[20, 22, 26, 28, 32]
             }
         }
         return grids[kaf]
@@ -107,14 +112,12 @@ def best_params_picker(filt, params_df, criteria='CB'): # CHANGE CRITERIA FOR TM
                'mu':best_params.mu.values[0], 
                'K':best_params.K.values[0]}
     elif filt == "QKLMS_AMK":
-        # bps = {'eta':best_params.eta.values[0],
-        #         'epsilon':best_params.epsilon.values[0],
-        #         'mu':best_params.mu.values[0],
-        #         'K':best_params.K.values[0], 'A_init':"pca"}
         bps = {'eta':best_params.eta.values[0],
                 'epsilon':best_params.epsilon.values[0],
                 'mu':best_params.mu.values[0],
-                'K':1}
+                'K':best_params.K.values[0], 'A_init':"pca"}
+                # 'K':6, 'A_init':"pca"}
+
     return bps
 
 def tradeOff(TMSE,CB):
@@ -138,7 +141,7 @@ def plotCB(model,X,savename="test"):
     for mean, cov in zip(means, covs):
         confidence_ellipse(cov=cov, mean=mean.reshape(-1,1), ax=ax, n_std=1, edgecolor='red')
     plt.legend()
-    folder = "Graficos/CB/"
+    folder = "Graficos/4.2/CB/"
     plt.savefig(folder + '{}.png'.format(savename), dpi=300)
     tikzplotlib.save(folder + 'tex/{}.tex'.format(savename))
     plt.show()
@@ -174,4 +177,60 @@ def confidence_ellipse(cov, mean, ax, n_std=3.0, facecolor='none', edgecolor='no
 
     ellipse.set_transform(transf + ax.transData)
     
-    return ax.add_patch(ellipse)
+def noisy_chua_generator(n_samples, seed=None, alpha = None, beta = None, noise=True):
+    #parameter generation
+    import sys
+    import random
+    var = 1
+    if seed == None:
+        seed_train = random.randint(0, 2000)
+        seed_test = random.randint(0, 2000)
+    
+    if alpha == None:
+        alpha_train = random.uniform(13.6,17.6)
+        alpha_test = random.uniform(13.6,17.6)
+    else:
+        alpha_train = alpha_test = alpha
+    if beta == None:
+        beta_train= random.uniform(26,30)
+        beta_test = random.uniform(26,30)
+    else:
+        beta_train = beta_test = beta
+    
+    dic1 = {'noise':noise, 'seed':seed_train, 'alpha':alpha_train, 'beta':beta_train, 'noise_var':var}
+    train,_,_ = GenerateAttractor(samples=n_samples, attractor='chua', **dic1)
+    
+    seed = random.randint(0, 2000)
+    # print(seed)
+    alpha = random.uniform(13.6,17.6)
+    beta = random.uniform(26,30)
+    dic2 = {'noise': noise, 'seed':seed_test, 'alpha':alpha_test, 'beta':beta_test, 'noise_var':var}
+    test,_,_ = GenerateAttractor(samples=n_samples, attractor='chua', **dic2)
+
+    return train, test, dic1, dic2
+    
+    
+def MSE(y_true, y_pred):
+    err = y_true-y_pred.reshape(-1,1)
+    return np.mean(err**2)
+
+def MAE(y_true, y_pred):
+    err = y_true-y_pred.reshape(-1,1)
+    return np.mean(abs(err))
+
+def MASE(y_true, y_pred):
+    err = y_true-y_pred.reshape(-1,1)
+    n = len(y_true)
+    num = abs(err)
+    den = abs(np.diff(y_true, axis=0)).sum()/(n-1)
+    return np.mean(num)/den
+
+def MAPE(y_true,y_pred):
+    err = y_true-y_pred.reshape(-1,1)
+    ape = (abs(err)/abs(y_true)).sum()
+    return np.mean(ape)
+
+def APE(y_true,y_pred):
+    err = y_true-y_pred.reshape(-1,1)
+    return (abs(err)/abs(y_true))
+    

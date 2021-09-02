@@ -1,0 +1,137 @@
+% This file was created with tikzplotlib v0.9.12.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0.917647058823529,0.917647058823529,0.949019607843137}
+\definecolor{color1}{rgb}{0.445098039215686,0.715686274509804,0.630392156862745}
+\definecolor{color2}{rgb}{0.912745098039216,0.586274509803922,0.459803921568627}
+\definecolor{color3}{rgb}{0.583333333333333,0.63921568627451,0.765686274509804}
+
+\begin{axis}[
+axis background/.style={fill=color0},
+axis line style={white},
+tick align=outside,
+title={CB final size},
+x grid style={white},
+xmajorgrids,
+xmajorticks=false,
+xmin=0.9, xmax=179.1,
+xtick style={color=white!15!black},
+y dir=reverse,
+y grid style={white},
+ymajorticks=false,
+ymin=-0.5, ymax=2.5,
+ytick style={color=white!15!black},
+ytick={0,1,2},
+yticklabels={QKLMS,QKLMS\_AKB,QKLMS\_AMK}
+]
+\path [draw=white!34.9019607843137!black, fill=color1, semithick]
+(axis cs:148.25,-0.4)
+--(axis cs:148.25,0.4)
+--(axis cs:163,0.4)
+--(axis cs:163,-0.4)
+--(axis cs:148.25,-0.4)
+--cycle;
+\path [draw=white!34.9019607843137!black, fill=color2, semithick]
+(axis cs:150,0.6)
+--(axis cs:150,1.4)
+--(axis cs:160.75,1.4)
+--(axis cs:160.75,0.6)
+--(axis cs:150,0.6)
+--cycle;
+\path [draw=white!34.9019607843137!black, fill=color3, semithick]
+(axis cs:13.5,1.6)
+--(axis cs:13.5,2.4)
+--(axis cs:17,2.4)
+--(axis cs:17,1.6)
+--(axis cs:13.5,1.6)
+--cycle;
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+148.25 0
+128 0
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+163 0
+169 0
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+128 -0.2
+128 0.2
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+169 -0.2
+169 0.2
+};
+\addplot [black, mark=diamond*, mark size=2.5, mark options={solid,fill=white!34.9019607843137!black}, only marks]
+table {%
+80 0
+124 0
+111 0
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+150 1
+140 1
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+160.75 1
+171 1
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+140 0.8
+140 1.2
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+171 0.8
+171 1.2
+};
+\addplot [black, mark=diamond*, mark size=2.5, mark options={solid,fill=white!34.9019607843137!black}, only marks]
+table {%
+95 1
+75 1
+119 1
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+13.5 2
+9 2
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+17 2
+19 2
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+9 1.8
+9 2.2
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+19 1.8
+19 2.2
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+154 -0.4
+154 0.4
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+155 0.6
+155 1.4
+};
+\addplot [semithick, white!34.9019607843137!black]
+table {%
+17 1.6
+17 2.4
+};
+\end{axis}
+
+\end{tikzpicture}

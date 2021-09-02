@@ -1037,7 +1037,7 @@ class QKLMS:
         import numpy as np
         dist = cdist(np.asarray(self.CB), ui)
         K = np.exp(-0.5*(dist**2)/(self.sigma**2))
-        y = K .T.dot(np.asarray(self.a_coef))[0]
+        y = K.T.dot(np.asarray(self.a_coef))[0]
         return [y,dist]
     
     def predict(self,u):
@@ -1371,16 +1371,16 @@ class QKLMS_AKB:
                                         
             self.CB_growth.append(len(self.CB)) #Crecimiento del diccionario 
             # print("sigma = {} en iteracion {}".format(self.sigma,i))
-            y.append(yi)
+            y.append(yi.item())
             self.mse.append(mean_squared_error(di,yi))
-        return y
+        return np.array(y)
 
     def __output(self,ui):
         from scipy.spatial.distance import cdist
         import numpy as np
         dist = cdist(np.asarray(self.CB), ui)
         K = np.exp(-0.5*(dist**2)/(self.sigma**2))
-        y = K.T.dot(np.asarray(self.a_coef))
+        y = K.T.dot(np.asarray(self.a_coef))[0]
         return [y,dist]
     
     def predict(self,u):
@@ -1391,7 +1391,7 @@ class QKLMS_AKB:
             ui = u[i]
             dist = cdist(np.asarray(self.CB), ui.reshape(1,-1))
             K = np.exp(-0.5*(dist**2)/(self.sigma**2))
-            y.append((K.T.dot(np.asarray(self.a_coef))).item())
+            y.append((K.T.dot(np.asarray(self.a_coef))))[0]
         return np.array(y)
         
     def __gu(self,error,i,ui):
@@ -1768,7 +1768,7 @@ class QKLMS_AMK:
         self.A_init = A_init
         self.scoring = False
         
-    def evaluate(self, u , d):        
+    def evaluate(self, u , d):   
         # u,d = self.embedder(X,y)        
         import numpy as np
         if len(u.shape) == 2:
@@ -1802,7 +1802,7 @@ class QKLMS_AMK:
             self.initialize = False
             # err = 0.1
             y.append(0)
-            return
+            return y
          
         from tqdm import tqdm
         #for i in tqdm(range(start,len(u))):
@@ -1811,12 +1811,11 @@ class QKLMS_AMK:
             di = d[i]
             yi,dis,K = self.output(ui.reshape(-1,D) ) #Salida             
             e = (di - yi).item() # Error
-            
             if np.any(np.isnan(yi)):
                 return 
             
             y.append(yi[0])# Salida                            
-                        
+            
             #Cuantizacion
             min_dis = np.argmin(dis)         
             if dis[min_dis] <= self.epsilon:
@@ -1850,7 +1849,6 @@ class QKLMS_AMK:
         d = cdist(self.CB, ui.reshape(1,-1),'mahalanobis', VI=np.dot(self.A.T,self.A))    
         K = np.exp(-0.5*(d**2))
         y = K.T.dot(np.asarray(self.a_coef))
-                
         return y,d,K
     
     def fit(self, X , y):
@@ -1934,7 +1932,7 @@ class QKLMS_AMK:
             ui = X[i]
             d = cdist(self.CB, ui.reshape(1,-1),'mahalanobis', VI=np.dot(self.A.T,self.A))    
             K = np.exp(-0.5*(d**2))
-            y.append((K.T.dot(np.asarray(self.a_coef))).item())
+            y.append((K.T.dot(np.asarray(self.a_coef)))[0])
         return np.array(y)
     
     def score(self, X=None, y=None):

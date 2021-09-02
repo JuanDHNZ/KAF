@@ -25,8 +25,9 @@ def chua(x=0, y=0, z=1, **kwargs):
     beta = kwargs.get('beta', 28)
     mu0 = kwargs.get('mu0', -1.143)
     mu1 = kwargs.get('mu1', -0.714)
-
+    
     ht = mu1*x + 0.5*(mu0 - mu1)*(np.abs(x + 1) - np.abs(x - 1))
+    
     # Next step coordinates:
     # Eq. 1:
     x_out = alpha*(y - x - ht)
@@ -201,7 +202,7 @@ def wang(x=0, y=0, z=0):
     return x_out, y_out, z_out
 
 
-def GenerateAttractor(samples = 1000, attractor = None, display=False):
+def GenerateAttractor(samples = 1000, attractor = None, display=False, **kwargs):
     """
     Generation of Nonlinear Timeseries Attractors.
 
@@ -243,17 +244,35 @@ def GenerateAttractor(samples = 1000, attractor = None, display=False):
     dt = 0.01
     
     # Set initial values
-    X[0], Y[0], Z[0] = (0., 1., 1.05)
+    # X[0], Y[0], Z[0] = (0., 1., 1.05)
     
-
-    # Step through "time", calculating the partial derivatives at the current point
-    # and using them to estimate the next point
-    for i in range(samples):
-        x_dot, y_dot, z_dot = attractors[attractor](X[i], Y[i], Z[i])
-        X[i + 1] = X[i] + (x_dot * dt)
-        Y[i + 1] = Y[i] + (y_dot * dt)
-        Z[i + 1] = Z[i] + (z_dot * dt)
+    # Random intial values
+    X[0] = np.random.uniform(-1.05,1.05)
+    Y[0] = np.random.uniform(-1.05,1.05)
+    Z[0] = np.random.uniform(-1.05,1.05)
     
+    if kwargs.get('noise', False):
+        mean = kwargs.get('noise_mean', 0.)
+        var = kwargs.get('noise_var', 1)
+        # Random Noise Generator
+        rng = np.random.default_rng(kwargs.get('seed', 1))
+        noise = rng.normal(mean, var**0.5, samples+1)
+        
+        for i in range(samples):
+            x_dot, y_dot, z_dot = attractors[attractor](X[i] + noise[i], Y[i] + noise[i], Z[i] + noise[i], **kwargs)
+            # x_dot, y_dot, z_dot = attractors[attractor](X[i], Y[i], Z[i], **kwargs)
+            X[i + 1] = X[i] + (x_dot * dt)
+            Y[i + 1] = Y[i] + (y_dot * dt)
+            Z[i + 1] = Z[i] + (z_dot * dt)
+    else:
+        # Step through "time", calculating the partial derivatives at the current point
+        # and using them to estimate the next point
+        for i in range(samples):
+            x_dot, y_dot, z_dot = attractors[attractor](X[i], Y[i], Z[i], **kwargs)
+            X[i + 1] = X[i] + (x_dot * dt)
+            Y[i + 1] = Y[i] + (y_dot * dt)
+            Z[i + 1] = Z[i] + (z_dot * dt)
+        
     # 3D Plot
     if display:
         fig = plt.figure()

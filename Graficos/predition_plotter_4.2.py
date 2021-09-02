@@ -84,6 +84,7 @@ plt.show()
 #Parameter selection
 path = '../results/4.2/GridSearch_MonteCarlo/mc_QKLMS_AKB_4.2_AKB_5003.csv'
 grid = pd.read_csv(path)
+
 params = tools.best_params_picker("QKLMS_AKB", grid, criteria=criteria)
 
 f = KAF.QKLMS_AKB(eta=params['eta'], 
@@ -127,8 +128,15 @@ plt.show()
 #%% QKLMS AMK PREDICTION
 
 #Parameter selection
-path = '../results/4.2/GridSearch_MonteCarlo/mc_QKLMS_AMK_4.2_AKB_5003.csv'
+path = '../results/4.2/GridSearch_MonteCarlo/mc2_QKLMS_AMK_4.2_AKB_5003.csv'
 grid = pd.read_csv(path)
+
+# path = '../results/4.2/GridSearch_MonteCarlo/NewEta_mc_QKLMS_AMK_4.2_AKB_5003.csv'
+# grid2 = pd.read_csv(path)
+
+# total = pd.concat([grid,grid2])
+# total.to_csv('../results/4.2/GridSearch_MonteCarlo/mc2_QKLMS_AMK_4.2_AKB_5003.csv')
+
 params = tools.best_params_picker("QKLMS_AMK", grid, criteria=criteria)
 
 f = KAF.QKLMS_AMK(eta=params['eta'], 

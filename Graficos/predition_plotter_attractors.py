@@ -17,12 +17,15 @@ import KAF
 
 criteria = "CB"
 folder = "Predictions/"
-N = 100
+samples = 1005
+attr = "chua"
+N = 1000
 plot_data = True
 save = False
+custom_params = True 
 #%% DATA GENERATION - 4.2 AKB nonlinear system
 
-x,y,z = GenerateAttractor(samples=5005, attractor="chua")
+x,y,z = GenerateAttractor(samples=samples, attractor=attr)
 system = tools.z_scorer(x)
 
 X,y = tools.Embedder(X=system, embedding=5)
@@ -31,16 +34,23 @@ Xtrain, Xtest, ytrain, ytest = tools.TrainTestSplit(X,y)
 if plot_data:
     print(Xtrain.shape, ytrain.shape)
     print(Xtest.shape, ytest.shape)
-    plt.plot(ytrain, color="red")
+    plt.plot(ytrain, color="red",label='train')
+    plt.legend()
     plt.show()
-    plt.plot(ytest, color="blue")
+    plt.plot(ytest, color="blue", label='test')
+    plt.legend()
     plt.show()
 #%%QKLSM PREDICTION
 
-#Parameter selection
-path = '../results/4.2/GridSearch_MonteCarlo/mc_QKLMS_4.2_AKB_5003.csv'
-grid = pd.read_csv(path)
-params = tools.best_params_picker("QKLMS", grid, criteria=criteria)
+# Parameter selection
+if custom_params:
+    params = {'eta':0.2,
+              'epsilon':0.35,
+              'sigma':0.6}
+else:       
+    path = '../results/4.2/GridSearch_MonteCarlo/mc_QKLMS_4.2_AKB_5003.csv'
+    grid = pd.read_csv(path)
+    params = tools.best_params_picker("QKLMS", grid, criteria=criteria)
 
 
 
@@ -49,6 +59,7 @@ f = KAF.QKLMS(eta=params['eta'],
           sigma=params['sigma'])
 
 ypred_train = f.evaluate(Xtrain,ytrain)
+ypred_train = f.predict(Xtrain)
 ypred_test = f.predict(Xtest)
 
 print("QKLMS CB = ", len(f.CB))
@@ -56,9 +67,11 @@ print("QKLMS CB = ", len(f.CB))
 # plt.plot(ypred_train, label='predict');plt.plot(ytrain, label='target')
 # plt.title('train');plt.legend();plt.show()
 plt.figure(figsize=(16,9))
-plt.ylim([-2,2])
+# plt.ylim([-2,2])
 plt.plot(ytest[-N:], lw=2, label='target',alpha=0.6,color="tab:blue")
 plt.plot(ypred_test[-N:], lw=2, label='predict', color="tab:red");
+# plt.plot(ytrain[-N:], lw=2, label='target',alpha=0.6,color="tab:blue")
+# plt.plot(ypred_train[-N:], lw=2, label='predict', color="tab:red");
 plt.title('QKLMS on test set - Codebook size = {}'.format(len(f.CB)))
 plt.legend()
 
@@ -127,9 +140,15 @@ plt.show()
 #%% QKLMS AMK PREDICTION
 
 #Parameter selection
-path = '../results/4.2/GridSearch_MonteCarlo/mc_QKLMS_AMK_4.2_AKB_5003.csv'
-grid = pd.read_csv(path)
-params = tools.best_params_picker("QKLMS_AMK", grid, criteria=criteria)
+if custom_params:
+    params = {'eta':0.3,
+              'epsilon':0.35,
+              'mu':0.05,
+              'K':4}
+else:   
+    path = '../results/4.2/GridSearch_MonteCarlo/mc_QKLMS_AMK_4.2_AKB_5003.csv'
+    grid = pd.read_csv(path)
+    params = tools.best_params_picker("QKLMS_AMK", grid, criteria=criteria)
 
 f = KAF.QKLMS_AMK(eta=params['eta'], 
           epsilon=params['epsilon'],
@@ -147,8 +166,10 @@ print("AMK CB = ", len(f.CB))
 # plt.title('train');plt.legend();plt.show()
 plt.figure(figsize=(16,9))
 plt.ylim([-2,2])
-plt.plot(ytest[-N:], lw=2, label='target',alpha=0.6,color="tab:blue")
-plt.plot(ypred_test[-N:], lw=2, label='predict', color="tab:red");
+# plt.plot(ytest[-N:], lw=2, label='target',alpha=0.6,color="tab:blue")
+# plt.plot(ypred_test[-N:], lw=2, label='predict', color="tab:red");
+plt.plot(ytrain[-N:], lw=2, label='target',alpha=0.6,color="tab:blue")
+plt.plot(ypred_train[-N:], lw=2, label='predict', color="tab:red");
 plt.title('QKLMS-AMK on test set - Codebook size = {}'.format(len(f.CB)))
 plt.legend()
 

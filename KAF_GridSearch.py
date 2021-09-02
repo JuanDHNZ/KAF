@@ -1,6 +1,5 @@
 import argparse
 import numpy as np
-
 np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 import warnings
 warnings.filterwarnings("ignore", category=RuntimeWarning) 
@@ -26,19 +25,19 @@ savepath = args.savepath
 
 # kaf = "QKLMS"
 # dataset = "chua"  
-# samples = 5003
+# samples = 1005
 # savepath = "results/Chua/"
-# mc_runs = 50
+# mc_runs = 20
 # embedding = 5
 #%%
 def main():
     from datasets.tools import grid_picker
     grid  = grid_picker(kaf)
     
-    from tunning import  GridSearchKAF, GridSearchKAF_MC
+    from tunning import  GridSearchKAF, GridSearchKAF_MC, GridSearchKAF_MC_chua
     # GridSearchKAF(filt=kaf,grid=grid,testingSystem=dataset,n_samples=samples,savepath=savepath)
-    GridSearchKAF_MC(filt=kaf,grid=grid,testingSystem=dataset,n_samples=samples,mc_runs=mc_runs,embedding=embedding,savepath=savepath)
-
+    # GridSearchKAF_MC(filt=kaf,grid=grid,testingSystem=dataset,n_samples=samples,mc_runs=mc_runs,embedding=embedding,savepath=savepath)
+    GridSearchKAF_MC_chua(filt=kaf,grid=grid,testingSystem=dataset,n_samples=samples,mc_runs=mc_runs,embedding=embedding,savepath=savepath)
     
 if __name__ == "__main__":
     main()
