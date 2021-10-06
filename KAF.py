@@ -2511,4 +2511,4 @@ class LRKOL:
         self.eta = (2*errp*y)/(errp**2 + 1)
         return False
     
-    def __
+#    def __

@@ -20,14 +20,24 @@ def Embedder(X, embedding = 2):
     return u,d
 
 def mc_sampler(X, n_samples, mc_runs, embedding = 2):
-    X = X.tolist()
-    run_samples = n_samples + embedding + 1
-    X_mc = []
-    for run in range(mc_runs):
-        run_slice = slice(0, run_samples)
-        X_mc.append(X[run_slice])
-        X = X[run_samples:]
-    return np.array(X_mc)
+    
+    embed = np.arange(embedding+1).reshape(1,1,-1)
+    samples = np.arange(n_samples).reshape(1,-1,1)    
+    mc = np.arange(0,len(X),n_samples+embedding+1)[:mc_runs].reshape(-1,1,1)
+    
+    indices = mc+samples+embed    
+        
+    return X[indices]
+    
+    
+    # X = X.tolist()
+    # run_samples = n_samples + embedding + 1
+    # X_mc = []
+    # for run in range(mc_runs):
+    #     run_slice = slice(0, run_samples)
+    #     X_mc.append(X[run_slice])
+    #     X = X[run_samples:]
+    # return np.array(X_mc)
     
 
 def TrainTestSplit(u, d, train_portion=0.8):

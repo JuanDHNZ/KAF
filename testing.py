@@ -21,8 +21,9 @@ nonlinears = ["4.1_AKB", "4.2_AKB"]
 
 def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, params_file, savepath):
     # 1. data generation
+    embedding=5
     print("Generating data...")
-    mc_samples = n_samples*(mc_runs + 1)
+    mc_samples = (n_samples+embedding)*(mc_runs + 1)
     if testingSystem in attractors:
         x,y,z = GenerateAttractor(samples=mc_samples, attractor=testingSystem)
         system = z_scorer(x)
@@ -34,17 +35,18 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
     
     # 2. data preparation
     print("Data preparation...")
-    system_mc =  mc_sampler(system, n_samples, mc_runs)
+    system_mc =  mc_sampler(system, n_samples, mc_runs,embedding=embedding)
     
     # 3. parameter grid
     # params_df = pd.read_csv(params_file)
     # params = best_params_picker(filt, params_df,criteria='CB_median')
     
     params = {'eta':0.1,
-           'epsilon':0.4,
-           'sigma_init':0.35,
-           'mu':0.4,
-           'K': 8}
+           'epsilon':0.2,
+           'sigma':np.sqrt(2)/2,
+           #'mu':0.4,
+           #'K': 8
+           }
     
     results_tmse = []     
     results_cb= []        
@@ -60,8 +62,13 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         # test = z_scorer(test)
         # Xtrain,ytrain = Embedder(X=train, embedding=embedding)
         # Xtest,ytest = Embedder(X=test, embedding=embedding)
-        X,y = Embedder(X=X_mc, embedding=2)
-        Xtrain, Xtest, ytrain, ytest = TrainTestSplit(X,y,train_portion=0.909090)
+        #X,y = Embedder(X=X_mc, embedding=5)
+        
+        train_portion=4000/4200
+        train_size = int(len(X)*train_portion)
+        Xtrain,ytrain = X_mc[:train_size,:-1],X_mc[:train_size,-1]
+        Xtest,ytest = X_mc[train_size:,:-1],X_mc[train_size:,-1]        
+        #Xtrain, Xtest, ytrain, ytest = TrainTestSplit(X,y,train_portion=4000/4200)
         
         f = KAF_picker(filt, params)
         

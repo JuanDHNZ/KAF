@@ -33,12 +33,12 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 #%% For testing only:
 
-kaf = "QKLMS_AKB"
-dataset = "4.2_AKB"    
-samples = 2202
-savepath = "results/4.2/LC/"
+kaf = "QKLMS"
+dataset = "lorenz"    
+samples = 4205
+savepath = "results/David/"
 params_file = "results/4.2v3/mc_QKLMS_4.2_AKB_5003.csv"
-mc_runs = 50
+mc_runs = 1
 pred_step = 1
 
 #%%
