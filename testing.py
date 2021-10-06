@@ -83,7 +83,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
                 y = f.evaluate(Xi,yi)
                 if np.mod(n,pred_step)==0:
                     ypred = f.predict(Xtest)
-                    err = ytest-ypred.reshape(-1,1)
+                    err = ytest-ypred.reshape(ytest.shape)
                     TMSE.append(np.mean(err**2))
                     CB.append(len(f.CB))
             except:
@@ -93,16 +93,16 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         results_tmse.append(TMSE) 
         results_cb.append(CB)
         
-    all_tmse = pd.DataFrame(data=results_tmse).T
-    tmse_cols = ["TMSE_{}".format(run) for run in range(mc_runs)]
-    all_tmse.columns = tmse_cols
-    all_cb = pd.DataFrame(data=results_cb).T
-    cb_cols = ["CB_{}".format(run) for run in range(mc_runs)]
-    all_cb.columns = cb_cols
-    results = pd.concat([all_cb,all_tmse], axis=1)
-    results['mean_CB'] = all_cb.mean(axis=1).values
-    results['mean_TMSE'] = all_tmse.mean(axis=1).values
-    results.to_csv(savepath + "tmse_{}_{}_{}_K_{}.csv".format(filt,testingSystem,n_samples,params['K']))
+        all_tmse = pd.DataFrame(data=results_tmse).T
+        tmse_cols = ["TMSE_{}".format(r) for r in range(run)]
+        all_tmse.columns = tmse_cols
+        all_cb = pd.DataFrame(data=results_cb).T
+        cb_cols = ["CB_{}".format(r) for r in range(run)]
+        all_cb.columns = cb_cols
+        results = pd.concat([all_cb,all_tmse], axis=1)
+        results['mean_CB'] = all_cb.mean(axis=1).values
+        results['mean_TMSE'] = all_tmse.mean(axis=1).values
+        results.to_csv(savepath + "tmse_{}_{}_{}_K_{}.csv".format(filt,testingSystem,n_samples,params['K']))
     return
 
 def LearningCurveKAF_MC2(filt, testingSystem, n_samples, mc_runs, pred_step, params_file, savepath):

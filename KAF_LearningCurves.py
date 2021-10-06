@@ -35,7 +35,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 kaf = "QKLMS"
 dataset = "lorenz"    
-samples = 4000
+samples = 4200
 savepath = "results/David/"
 params_file = "results/4.2v3/mc_QKLMS_4.2_AKB_5003.csv"
 mc_runs = 50
