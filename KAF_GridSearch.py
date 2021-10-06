@@ -23,11 +23,11 @@ savepath = args.savepath
 
 #%% For testing only:
 
-# kaf = "QKLMS"
+# kaf = "QKLMS_AMK"
 # dataset = "chua"  
-# samples = 1005
+# samples = 100
 # savepath = "results/Chua/"
-# mc_runs = 20
+# mc_runs = 2
 # embedding = 5
 #%%
 def main():
@@ -36,8 +36,8 @@ def main():
     
     from tunning import  GridSearchKAF, GridSearchKAF_MC, GridSearchKAF_MC_chua
     # GridSearchKAF(filt=kaf,grid=grid,testingSystem=dataset,n_samples=samples,savepath=savepath)
-    # GridSearchKAF_MC(filt=kaf,grid=grid,testingSystem=dataset,n_samples=samples,mc_runs=mc_runs,embedding=embedding,savepath=savepath)
-    GridSearchKAF_MC_chua(filt=kaf,grid=grid,testingSystem=dataset,n_samples=samples,mc_runs=mc_runs,embedding=embedding,savepath=savepath)
+    GridSearchKAF_MC(filt=kaf,grid=grid,testingSystem=dataset,n_samples=samples,mc_runs=mc_runs,embedding=embedding,savepath=savepath)
+    # GridSearchKAF_MC_chua(filt=kaf,grid=grid,testingSystem=dataset,n_samples=samples,mc_runs=mc_runs,embedding=embedding,savepath=savepath)
     
 if __name__ == "__main__":
     main()

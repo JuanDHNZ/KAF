@@ -7,6 +7,7 @@ import os
 from datasets.ChaoticTimeSeries import GenerateAttractor
 from datasets.TestingSystems import GenerateSystem 
 from datasets.tools import *
+import scipy
 
 # models and metrics
 import KAF
@@ -55,36 +56,39 @@ def GridSearchKAF(filt, grid, testingSystem, n_samples, savepath):
 
 def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, embedding, savepath):
     # 1. data generation
-    # mc_samples = n_samples*(mc_runs + 1)
-    # if testingSystem in attractors:
-    #     x,y,z = GenerateAttractor(samples=mc_samples, attractor=testingSystem)
-    #     system = z_scorer(x)
-    # elif testingSystem in nonlinears:
-    #     system = GenerateSystem(samples=mc_samples, systemType=testingSystem)
-    #     system = z_scorer(system)
-    # else:
-    #     raise ValueError("{} dataset is not supported".format(testingSystem))
+    mc_samples = n_samples*(mc_runs + 1)
+    if testingSystem in attractors:
+        x,y,z = GenerateAttractor(samples=mc_samples, attractor=testingSystem)
+        system = z_scorer(x)
+    elif testingSystem in nonlinears:
+        system = GenerateSystem(samples=mc_samples, systemType=testingSystem)
+        system = z_scorer(system)
+    else:
+        raise ValueError("{} dataset is not supported".format(testingSystem))
     
     # 2. data preparation
-    # system_mc =  mc_sampler(system, n_samples, mc_runs)
+    system_mc =  mc_sampler(system, n_samples, mc_runs)
     
     TMSE = []
     CB = []
+    
     TradeOff = []
     
     # 3. parameter grid 
     params = parameter_picker(filt, grid)
     
     # 4. Monte Carlo simulations
-    for run in range(mc_runs):
+    for run, X_mc in enumerate(system_mc):
         print("\nRunning Monte Carlo simulation #{}...\n".format(run+1))    
         
-        train, test, dic_train, dic_test = noisy_chua_generator(n_samples, alpha=12, beta=28)
-        train = z_scorer(train)
-        test = z_scorer(test)
-        Xtrain,ytrain = Embedder(X=train, embedding=embedding)
-        Xtest,ytest = Embedder(X=test, embedding=embedding)
+        # train, test, dic_train, dic_test = noisy_chua_generator(n_samples, alpha=12, beta=28)
+        # train = z_scorer(train)
+        # test = z_scorer(test)
+        # Xtrain,ytrain = Embedder(X=train, embedding=embedding)
+        # Xtest,ytest = Embedder(X=test, embedding=embedding)
 
+        X,y = Embedder(X=X_mc, embedding=embedding)
+        Xtrain, Xtest, ytrain, ytest = TrainTestSplit(X,y)
         
         partial_params = []
         for p in tqdm(params):
@@ -97,7 +101,6 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, embedding, s
                 err = ytest-ypred.reshape(-1,1)
                 TMSE.append(np.mean(err**2))
                 CB.append(len(f.CB))
-                
             except:
                 TMSE.append(np.nan)
                 CB.append(np.nan)
@@ -113,18 +116,29 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, embedding, s
         results_df_partial = pd.DataFrame(data=results_partial)
         results_df_partial['TMSE'] = mean_TMSE_partial
         results_df_partial['CB'] = mean_CB_partial.astype(int)
+        
         results_df_partial.to_csv(savepath + "PARTIAL_mc_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
     TMSE = np.array(TMSE).reshape(mc_runs,-1)
     CB = np.array(CB).reshape(mc_runs,-1)
     # TradeOff = np.array(TradeOff).reshape(mc_runs,-1)
     
     mean_TMSE = np.nanmean(TMSE, axis=0)
+    std_TMSE = np.nanstd(TMSE, axis=0)
+    
     mean_CB = np.nanmean(CB, axis=0)
+    median_CB = np.nanmedian(CB, axis=0)
+    mode_CB = scipy.stats.mode(CB, axis=0)
+    std_CB = np.nanstd(CB, axis=0)
         
     results = [p for p in params]
     results_df = pd.DataFrame(data=results)
     results_df['TMSE'] = mean_TMSE 
-    results_df['CB'] = mean_CB.astype(int)
+    results_df['TMSE_std'] = np.nanstd(TMSE, axis=0)
+    results_df['CB_mean'] = mean_CB.astype(int)
+    results_df['CB_median'] = median_CB.astype(int)
+    results_df['CB_mode'] = mode_CB[0].ravel()
+    results_df['CB_std'] = np.nanstd(CB, axis=0)
+    
     # remove partials CSV
     partial_file = savepath + "PARTIAL_mc_{}_{}_{}.csv".format(filt,testingSystem,n_samples)
     if(os.path.exists(partial_file) and os.path.isfile(partial_file)):
@@ -132,7 +146,7 @@ def GridSearchKAF_MC(filt, grid, testingSystem, n_samples, mc_runs, embedding, s
             os.remove(partial_file)
         except:
             print("PARTIAL file not deleted.")
-    results_df.to_csv(savepath + "new_params2_mc_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
+    results_df.to_csv(savepath + "mc_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
     return
 
 

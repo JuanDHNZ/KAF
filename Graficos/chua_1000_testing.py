@@ -114,8 +114,8 @@ grid = pd.read_csv(path)
 
 params = tools.best_params_picker("QKLMS_AKB", grid, criteria=criteria)
 
-f = KAF.QKLMS_AKB(eta=params['eta'], 
-          epsilon=params['epsilon'], 
+f = KAF.QKLMS_AKB(eta=params['eta'],
+          epsilon=params['epsilon'],
           sigma_init=params['sigma_init'],
           mu = params['mu'],
           K = params['K'])

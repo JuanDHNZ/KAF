@@ -35,7 +35,8 @@ def TrainTestSplit(u, d, train_portion=0.8):
     test_slice = slice(int(len(u)*train_portion),-1)
     return [u[train_slice], u[test_slice], d[train_slice], d[test_slice]]
 
-def z_scorer(system):
+def z_scorer(x):
+    system = x.copy()
     system -= system.mean()
     system /= system.std()
     return system
@@ -52,7 +53,7 @@ def grid_picker(kaf):
                 "eta":[0.05, 0.1, 0.2],
                 "epsilon":[0.35, 0.5, 1],
                 "sigma_init": [0.2, 0.4, 0.6],
-                "mu":[0.05, 0.1, 0.2 , 0.3, 0.4],
+                "mu":[0.2 , 0.4, 0.6],
                 "K":[1,2,4,6,8]
             },
             "QKLMS_AMK": {
@@ -92,6 +93,8 @@ def KAF_picker(filt, params):
             kaf_filt = KAF.QKLMS_AKB(eta=params['eta'],epsilon=params['epsilon'],sigma_init=params['sigma_init'], mu=params['mu'], K=params['K'])
         elif filt == "QKLMS_AMK":
             kaf_filt = KAF.QKLMS_AMK(eta=params['eta'],epsilon=params['epsilon'], mu=params['mu'], Ka=params['K'], A_init="pca")
+        elif filt == "QKLMS_AKS":
+            kaf_filt = KAF.QKLMS_AKS(eta=params['eta'],epsilon=params['epsilon'], mu=params['mu'], sigma=params['sigma'])
         return kaf_filt
     except: 
         raise ValueError("Filter definition for {} failed".format(filt))
@@ -99,11 +102,16 @@ def KAF_picker(filt, params):
 def best_params_picker(filt, params_df, criteria='CB'): # CHANGE CRITERIA FOR TMSE CURVE
     best_params = params_df[params_df[criteria] == params_df[criteria].min()]
     
+    if len(best_params.index) > 1 and criteria=='CB_median':
+        best_params = best_params[best_params['TMSE']==best_params['TMSE'].min()]
     
     if filt == "QKLMS":
         bps = {'eta':best_params.eta.values[0],
-               'epsilon':best_params.epsilon.values[0],
-               'sigma':best_params.sigma.values[0]}
+                'epsilon':best_params.epsilon.values[0],
+                'sigma':best_params.sigma.values[0]}
+        # bps = {'eta':0.2,
+        #        'epsilon':0.1,
+        #        'sigma':0.35}
         
     elif filt == "QKLMS_AKB":
         bps = {'eta':best_params.eta.values[0],
@@ -117,6 +125,12 @@ def best_params_picker(filt, params_df, criteria='CB'): # CHANGE CRITERIA FOR TM
                 'mu':best_params.mu.values[0],
                 'K':best_params.K.values[0], 'A_init':"pca"}
                 # 'K':6, 'A_init':"pca"}
+    elif filt == "QKLMS_AKS":
+        bps = {'eta':0.05,
+               'epsilon':0.35,
+               'sigma':0.4,
+               'mu':0.01}
+        
 
     return bps
 
@@ -139,9 +153,33 @@ def plotCB(model,X,savename="test"):
     plt.title("CB = {}".format(len(model.CB)))
     # # plot_gmm(gmm, u)
     for mean, cov in zip(means, covs):
-        confidence_ellipse(cov=cov, mean=mean.reshape(-1,1), ax=ax, n_std=1, edgecolor='red')
+        confidence_ellipse(cov=cov, mean=mean, ax=ax, n_std=1, edgecolor='red')
     plt.legend()
-    folder = "Graficos/4.2/CB/"
+    folder = "Graficos/4.2v2/CB/TMSE/"
+    plt.savefig(folder + '{}.png'.format(savename), dpi=300)
+    tikzplotlib.save(folder + 'tex/{}.tex'.format(savename))
+    plt.show()
+    return
+
+def plotCB_AKB(model,X,savename="test"): 
+    means = np.array(model.CB)
+    covs = [(model.sigma**2)*np.eye(2) for n in range(len(model.CB))]
+    # covs = [np.linalg.inv(np.dot(A.T,A)) for A in model.At]
+
+    fig, ax = plt.subplots()
+    ax.scatter(means[:, 0], means[:, 1], s=20, color='red', marker="X", label="CB_centroid")
+    ax.scatter(X[:, 0], X[:, 1], s=10, color='blue', marker="x", label="Samples")
+    plt.ylim([-6,6])
+    plt.xlim([-6,6])
+    plt.title("CB = {}  |  $\sigma$ = {}".format(len(model.CB),model.sigma))
+    # # plot_gmm(gmm, u)
+    for mean, cov in zip(means, covs):
+        confidence_ellipse(cov=cov, mean=mean, ax=ax, n_std=1, edgecolor='red')
+    plt.legend()
+    plt.axis("equal")
+    plt.ylim([-6,6])
+    plt.xlim([-6,6])
+    folder = "Graficos/4.2v2/CB/TMSE/"
     plt.savefig(folder + '{}.png'.format(savename), dpi=300)
     tikzplotlib.save(folder + 'tex/{}.tex'.format(savename))
     plt.show()
@@ -176,6 +214,7 @@ def confidence_ellipse(cov, mean, ax, n_std=3.0, facecolor='none', edgecolor='no
         .translate(mean_x, mean_y)
 
     ellipse.set_transform(transf + ax.transData)
+    return ax.add_patch(ellipse)
     
 def noisy_chua_generator(n_samples, seed=None, alpha = None, beta = None, noise=True):
     #parameter generation

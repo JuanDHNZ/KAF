@@ -1,5 +1,5 @@
 class BGMM_KLMS:
-    """Filtro QKLMS que aplica distacia de Mahalanobis en la cuantización y en el kernel"""
+    """Filtro QKLMS que aplica distacia de Mahalanobis en la cuantizaciÃ³n y en el kernel"""
     def __init__(self, clusters = 1, wcp = 1, eta = 0.9, max_iter = 500, warm_start=False):
         self.max_iter = max_iter
         self.warm_start = warm_start
@@ -25,7 +25,7 @@ class BGMM_KLMS:
         
     ''' 
     Parametros:
-        u -> Señal de entrada
+        u -> SeÃ±al de entrada
         d -> Salida deseada
         
     El metodo evalua cada muestra de entrada, y determina si se debe crear un nuevo centroide
@@ -33,7 +33,7 @@ class BGMM_KLMS:
     '''
     def evaluate(self, u , d):
         import numpy as np
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u.shape) == 2:
             if u.shape[0]!=d.shape[0]:
                 raise ValueError('All of the input arguments must be of the same lenght')
@@ -46,7 +46,7 @@ class BGMM_KLMS:
             from scipy.spatial.distance import cdist
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         #Inicializaciones
@@ -186,7 +186,7 @@ class BGMM_KLMS:
         if u is None:
             raise ValueError("Parameter u is missing")
                     
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         y = np.empty((N,), dtype=float)
         i = 0      
@@ -233,7 +233,7 @@ class BGMM_KLMS:
     #     u=0
 
 class GMM_KLMS:
-    """Filtro QKLMS que aplica distacia de Mahalanobis en la cuantización y en el kernel"""
+    """Filtro QKLMS que aplica distacia de Mahalanobis en la cuantizaciÃ³n y en el kernel"""
     def __init__(self, clusters = None, eta = 0.9):
         self.clusters = clusters
         self.eta = eta #Tasa de aprendizaje
@@ -255,7 +255,7 @@ class GMM_KLMS:
         
     ''' 
     Parametros:
-        u -> Señal de entrada
+        u -> SeÃ±al de entrada
         d -> Salida deseada
         
     El metodo evalua cada muestra de entrada, y determina si se debe crear un nuevo centroide
@@ -263,7 +263,7 @@ class GMM_KLMS:
     '''
     def evaluate(self, u , d):
         import numpy as np
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u.shape) == 2:
             if u.shape[0]!=d.shape[0]:
                 raise ValueError('All of the input arguments must be of the same lenght')
@@ -276,7 +276,7 @@ class GMM_KLMS:
             from scipy.spatial.distance import cdist
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         #Inicializaciones
@@ -412,7 +412,7 @@ class GMM_KLMS:
         if u is None:
             raise ValueError("Parameter u is missing")
                     
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         y = np.empty((N,), dtype=float)
         i = 0      
@@ -460,7 +460,7 @@ class GMM_KLMS:
 
 
 class QKLMS3:
-    """Filtro QKLMS que aplica distacia de Mahalanobis en la cuantización y en el kernel"""
+    """Filtro QKLMS que aplica distacia de Mahalanobis en la cuantizaciÃ³n y en el kernel"""
     def __init__(self, eta=0.9, epsilon=10, sigma=None):
         self.eta = eta #Remplazar por algun criterio
         self.epsilon = epsilon
@@ -483,7 +483,7 @@ class QKLMS3:
         
     ''' 
     Parametros:
-        u -> Señal de entrada
+        u -> SeÃ±al de entrada
         d -> Salida deseada
         
     El metodo evalua cada muestra de entrada, y determina si se debe crear un nuevo centroide
@@ -491,7 +491,7 @@ class QKLMS3:
     '''
     def evaluate(self, u , d):
         import numpy as np
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u.shape) == 2:
             if u.shape[0]!=d.shape[0]:
                 raise ValueError('All of the input arguments must be of the same lenght')
@@ -504,7 +504,7 @@ class QKLMS3:
             from scipy.spatial.distance import cdist
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         #Inicializaciones
@@ -622,7 +622,7 @@ class QKLMS3:
             from scipy.spatial.distance import cdist
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         
@@ -689,7 +689,7 @@ class QKLMS3:
             raise ValueError("Fit method must be runed first")
         if u is None:
             raise ValueError("Parameter u is missing")               
-        #Tamaños u y d   
+        #TamaÃ±os u y d   
         y,d = self.__output(u)
         return y
     
@@ -721,7 +721,7 @@ class QKLMS3:
         
 
 class QKLMS2:   
-    """Filtro QKLMS que aplica distacia de Mahalanobis en la cuantización"""
+    """Filtro QKLMS que aplica distacia de Mahalanobis en la cuantizaciÃ³n"""
     def __init__(self, eta=0.9, epsilon=10, sigma=None):
         self.eta = eta #Remplazar por algun criterio
         self.epsilon = epsilon
@@ -743,7 +743,7 @@ class QKLMS2:
         
     ''' 
     Parametros:
-        u -> Señal de entrada
+        u -> SeÃ±al de entrada
         d -> Salida deseada
         
     El metodo evalua cada muestra de entrada, y determina si se debe crear un nuevo centroide
@@ -751,7 +751,7 @@ class QKLMS2:
     '''
     def evaluate(self, u , d):
         import numpy as np
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u.shape) == 2:
             if u.shape[0]!=d.shape[0]:
                 raise ValueError('All of the input arguments must be of the same lenght')
@@ -764,7 +764,7 @@ class QKLMS2:
             from scipy.spatial.distance import cdist
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         #Inicializaciones
@@ -866,7 +866,7 @@ class QKLMS2:
             from scipy.spatial.distance import cdist
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         
@@ -929,7 +929,7 @@ class QKLMS2:
             raise ValueError("Fit method must be runed first")
         if u is None:
             raise ValueError("Parameter u is missing")    
-        #Tamaños u y d    
+        #TamaÃ±os u y d    
         y,d = self.__output(u)
         return y
     
@@ -977,7 +977,7 @@ class QKLMS:
         
     def evaluate(self, u , d):
         import numpy as np
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u.shape) == 2:
             if u.shape[0]!=d.shape[0]:
                 raise ValueError('All of the input arguments must be of the same lenght')
@@ -990,7 +990,7 @@ class QKLMS:
             from scipy.spatial.distance import cdist
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         
@@ -1000,6 +1000,7 @@ class QKLMS:
             self.CB.append(u[0,:]) #Codebook
             self.a_coef.append(self.eta*d[0,:]) #Coeficientes
             self.initialize = False
+            # self.apriori_error = 0
             start = 1
             y.append(0)
             if u.shape[0] == 1:                
@@ -1018,6 +1019,7 @@ class QKLMS:
             yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
             # self.__newEta(yi,err) #Nuevo eta
             err = (di - yi).item() # Error
+            self.apriori_error = err
             #Cuantizacion
             min_index = np.argmin(disti)
             
@@ -1236,10 +1238,10 @@ class KRLS_ALD:
     def evaluate(self, u , d):
         import numpy as np
         from tqdm import tqdm
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u) != len(d):
             raise ValueError('All of the input arguments must be of the same lenght')                
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         #Definiciones
@@ -1315,7 +1317,7 @@ class QKLMS_AKB:
         
     def evaluate(self, u , d):
         import numpy as np
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u.shape) == 2:
             if u.shape[0]!=d.shape[0]:
                 raise ValueError('All of the input arguments must be of the same lenght')
@@ -1328,7 +1330,7 @@ class QKLMS_AKB:
             from scipy.spatial.distance import cdist
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         #Inicializaciones
@@ -1391,7 +1393,7 @@ class QKLMS_AKB:
             ui = u[i]
             dist = cdist(np.asarray(self.CB), ui.reshape(1,-1))
             K = np.exp(-0.5*(dist**2)/(self.sigma**2))
-            y.append((K.T.dot(np.asarray(self.a_coef))))[0]
+            y.append((K.T.dot(np.asarray(self.a_coef))).item())
         return np.array(y)
         
     def __gu(self,error,i,ui):
@@ -1437,10 +1439,10 @@ class ALDKRLS_AKB:
     def evaluate(self, u , d):
         import numpy as np
         from tqdm import tqdm
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u) != len(d):
             raise ValueError('All of the input arguments must be of the same lenght')                
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         #Definicioness
@@ -1544,10 +1546,10 @@ class KRLS_ALD_2:
     def evaluate(self, u , d):
         import numpy as np
         from tqdm import tqdm
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u) != len(d):
             raise ValueError('All of the input arguments must be of the same lenght')                
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         #Defs
@@ -1649,10 +1651,10 @@ class ALDKRLS_AKB_2:
     def evaluate(self, u , d):
         import numpy as np
         from tqdm import tqdm
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u) != len(d):
             raise ValueError('All of the input arguments must be of the same lenght')                
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         #Defs
@@ -1832,8 +1834,7 @@ class QKLMS_AMK:
                         na = np.linalg.norm(self.Ak[i],"fro")
                         self.Ak[i] -= self.mu*(da/nda)*na                                                          
                 else:
-                    self.Ak.append(self.A0.copy())
-                    
+                    self.Ak.append(self.A0.copy())                    
                 self.A = self.Ak[-1].copy()
                 self.At.append(self.A.copy())
                 
@@ -2101,7 +2102,7 @@ class QKLMS_M:
         
     def evaluate(self, u , d):
         import numpy as np
-        #Validación d tamaños de entrada
+        #ValidaciÃ³n d tamaÃ±os de entrada
         if len(u.shape) == 2:
             if u.shape[0]!=d.shape[0]:
                 raise ValueError('All of the input arguments must be of the same lenght')
@@ -2110,7 +2111,7 @@ class QKLMS_M:
                 u = u.reshape(1,-1)
                 d = d.reshape(1,-1)
 
-        #Tamaños u y d
+        #TamaÃ±os u y d
         N,D = u.shape
         Nd,Dd = d.shape
         
@@ -2165,3 +2166,349 @@ class QKLMS_M:
         K = np.exp(-0.5*(dist**2))
         y = K.T.dot(np.asarray(self.a_coef))
         return y, K
+    
+class QKLMS_AKS:
+    """Chen, B., Liang, J., Zheng, N., & Príncipe, J. C. (2016). 
+    Kernel least mean square with adaptive kernel size. 
+    Neurocomputing, 191, 95–106. doi:10.1016/j.neucom.2016.01.004 """
+    def __init__(self, eta=0.9, epsilon=10, mu=0.1, sigma=None):
+        self.eta = eta #Remplazar por algun criterio
+        self.epsilon = epsilon
+        self.sigma = sigma
+        self.sigma_n = []
+        self.mu = mu
+        self.CB = [] #Codebook
+        self.a_coef = [] #Coeficientes
+        self.__CB_cov = [] #Covarianzas
+        self.__CB_cov_sums = [] #Sumas acumuladas
+        self.__CB_cov_prods = [] #Productos acumulados
+        self.__n_cov = [] # n iteraciones en covarianza
+        self.CB_growth = [] #Crecimiento del codebook por iteracion
+        self.initialize = True #Bandera de inicializacion   
+        self.evals = 0  #
+        
+        self.testCB_means = [] #Prueba
+        self.testDists = []
+        
+    def evaluate(self, u , d):
+        import numpy as np
+        #ValidaciÃ³n d tamaÃ±os de entrada
+        if len(u.shape) == 2:
+            if u.shape[0]!=d.shape[0]:
+                raise ValueError('All of the input arguments must be of the same lenght')
+        else:
+            if len(u.shape) == 1:
+                u = u.reshape(1,-1)
+                d = d.reshape(1,-1)
+        #Sigma definido por criterio de mediana
+        if self.sigma == None:
+            from scipy.spatial.distance import cdist
+       	    d_sgm = cdist(u,u)
+       	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
+        #TamaÃ±os u y d
+        N,D = u.shape
+        Nd,Dd = d.shape
+        
+        #Inicializaciones
+        y = []
+        if self.initialize:
+            self.CB.append(u[0,:]) #Codebook
+            self.a_coef.append(self.eta*d[0,:]) #Coeficientes
+            self.initialize = False
+            self.rho = 2*self.eta*self.mu
+            start = 1
+            y.append(0)
+            if u.shape[0] == 1:                
+                return
+        else:
+            start = 0      
+        from sklearn.metrics import mean_squared_error
+        self.mse = []
+        self.mse_ins = []
+        yt = []
+        err_ant = 0
+        
+        from tqdm import tqdm
+        # for i in tqdm(range(start,len(u))):
+        for i in range(start,len(u)):
+            ui = u[i]
+            di = d[i]           
+            yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
+            # self.__newEta(yi,err) #Nuevo eta
+            err = (di - yi).item() # Error
+            #Cuantizacion
+            min_index = np.argmin(disti)
+            
+            if disti[min_index] <= self.epsilon:
+              self.a_coef[min_index] =self.a_coef[min_index] + self.eta*err
+            else:
+              CB_ant = self.CB[-1]
+              CB = u[i,:]
+              # self.sigma += self.rho*err_ant*err* np.linalg.norm(CB-CB_ant)**2 * np.linalg.norm(CB-CB_ant)/self.sigma**3
+              self.sigma += self.rho*err_ant*err* np.linalg.norm(CB_ant-CB)**2 * np.exp(-(np.linalg.norm(CB_ant-CB)**2)/(2*self.sigma**2))/self.sigma**3
+              err_ant = err
+              self.CB.append(u[i,:])
+              self.a_coef.append(self.eta*err) 
+            self.sigma_n.append(self.sigma) 
+            self.CB_growth.append(len(self.CB)) #Crecimiento del diccionario 
+            y.append(yi.item())
+            yt.append(di.item())
+        return np.array(y)
+
+    def __output(self,ui):
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        dist = cdist(np.asarray(self.CB), ui)
+        K = np.exp(-0.5*(dist**2)/(self.sigma**2))
+        y = K.T.dot(np.asarray(self.a_coef))[0]
+        return [y,dist]
+    
+    def predict(self,u):
+        N,D = u.shape
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        y = []
+        # for i in tqdm(range(len(u))):
+        for i in range(len(u)):
+            ui = u[i]         
+            dist = cdist(np.asarray(self.CB), ui.reshape(1,-1))
+            K = np.exp(-0.5*(dist**2)/(self.sigma**2))            
+            y.append((K.T.dot(np.asarray(self.a_coef))).item())
+        return np.array(y)
+
+    def __newEta(self, y, errp):
+        # y: Salida calculada
+        # errp: Error a priori 
+        self.eta = (2*errp*y)/(errp**2 + 1)
+        return False
+    
+class QKLMS_AKS:
+    """Chen, B., Liang, J., Zheng, N., & Príncipe, J. C. (2016). 
+    Kernel least mean square with adaptive kernel size. 
+    Neurocomputing, 191, 95–106. doi:10.1016/j.neucom.2016.01.004 """
+    def __init__(self, eta=0.9, epsilon=10, mu=0.1, sigma=None):
+        self.eta = eta #Remplazar por algun criterio
+        self.epsilon = epsilon
+        self.sigma = sigma
+        self.sigma_n = []
+        self.mu = mu
+        self.CB = [] #Codebook
+        self.a_coef = [] #Coeficientes
+        self.__CB_cov = [] #Covarianzas
+        self.__CB_cov_sums = [] #Sumas acumuladas
+        self.__CB_cov_prods = [] #Productos acumulados
+        self.__n_cov = [] # n iteraciones en covarianza
+        self.CB_growth = [] #Crecimiento del codebook por iteracion
+        self.initialize = True #Bandera de inicializacion   
+        self.evals = 0  #
+        
+        self.testCB_means = [] #Prueba
+        self.testDists = []
+        
+    def evaluate(self, u , d):
+        import numpy as np
+        #ValidaciÃ³n d tamaÃ±os de entrada
+        if len(u.shape) == 2:
+            if u.shape[0]!=d.shape[0]:
+                raise ValueError('All of the input arguments must be of the same lenght')
+        else:
+            if len(u.shape) == 1:
+                u = u.reshape(1,-1)
+                d = d.reshape(1,-1)
+        #Sigma definido por criterio de mediana
+        if self.sigma == None:
+            from scipy.spatial.distance import cdist
+       	    d_sgm = cdist(u,u)
+       	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
+        #TamaÃ±os u y d
+        N,D = u.shape
+        Nd,Dd = d.shape
+        
+        #Inicializaciones
+        y = []
+        if self.initialize:
+            self.CB.append(u[0,:]) #Codebook
+            self.a_coef.append(self.eta*d[0,:]) #Coeficientes
+            self.initialize = False
+            self.rho = 2*self.eta*self.mu
+            start = 1
+            y.append(0)
+            if u.shape[0] == 1:                
+                return
+        else:
+            start = 0      
+        from sklearn.metrics import mean_squared_error
+        self.mse = []
+        self.mse_ins = []
+        yt = []
+        err_ant = 0
+        
+        from tqdm import tqdm
+        # for i in tqdm(range(start,len(u))):
+        for i in range(start,len(u)):
+            ui = u[i]
+            di = d[i]           
+            yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
+            # self.__newEta(yi,err) #Nuevo eta
+            err = (di - yi).item() # Error
+            #Cuantizacion
+            min_index = np.argmin(disti)
+            
+            if disti[min_index] <= self.epsilon:
+              self.a_coef[min_index] =self.a_coef[min_index] + self.eta*err
+            else:
+              CB_ant = self.CB[-1]
+              CB = u[i,:]
+              # self.sigma += self.rho*err_ant*err* np.linalg.norm(CB-CB_ant)**2 * np.linalg.norm(CB-CB_ant)/self.sigma**3
+              self.sigma += self.rho*err_ant*err* np.linalg.norm(CB_ant-CB)**2 * np.exp(-(np.linalg.norm(CB_ant-CB)**2)/(2*self.sigma**2))/self.sigma**3
+              err_ant = err
+              self.CB.append(u[i,:])
+              self.a_coef.append(self.eta*err) 
+            self.sigma_n.append(self.sigma) 
+            self.CB_growth.append(len(self.CB)) #Crecimiento del diccionario 
+            y.append(yi.item())
+            yt.append(di.item())
+        return np.array(y)
+
+    def __output(self,ui):
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        dist = cdist(np.asarray(self.CB), ui)
+        K = np.exp(-0.5*(dist**2)/(self.sigma**2))
+        y = K.T.dot(np.asarray(self.a_coef))[0]
+        return [y,dist]
+    
+    def predict(self,u):
+        N,D = u.shape
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        y = []
+        # for i in tqdm(range(len(u))):
+        for i in range(len(u)):
+            ui = u[i]         
+            dist = cdist(np.asarray(self.CB), ui.reshape(1,-1))
+            K = np.exp(-0.5*(dist**2)/(self.sigma**2))            
+            y.append((K.T.dot(np.asarray(self.a_coef))).item())
+        return np.array(y)
+
+    def __newEta(self, y, errp):
+        # y: Salida calculada
+        # errp: Error a priori 
+        self.eta = (2*errp*y)/(errp**2 + 1)
+        return False
+    
+class LRKOL:
+    """Fan, H., & Song, Q. (2014). A linear recurrent kernel online learning algorithm with 
+    sparse updates. Neural Networks, 50, 142–153. doi:10.1016/j.neunet.2013.11.011 """
+    def __init__(self, eta=0.9, epsilon=10, mu=0.1, sigma=None):
+        self.eta = eta #Remplazar por algun criterio
+        self.epsilon = epsilon
+        self.sigma = sigma
+        self.sigma_n = []
+        self.mu = mu
+        self.CB = [] #Codebook
+        self.a_coef = [] #Coeficientes
+        self.__CB_cov = [] #Covarianzas
+        self.__CB_cov_sums = [] #Sumas acumuladas
+        self.__CB_cov_prods = [] #Productos acumulados
+        self.__n_cov = [] # n iteraciones en covarianza
+        self.CB_growth = [] #Crecimiento del codebook por iteracion
+        self.initialize = True #Bandera de inicializacion   
+        self.evals = 0  #
+        
+        self.testCB_means = [] #Prueba
+        self.testDists = []
+        
+    def evaluate(self, u , d):
+        import numpy as np
+        #ValidaciÃ³n d tamaÃ±os de entrada
+        if len(u.shape) == 2:
+            if u.shape[0]!=d.shape[0]:
+                raise ValueError('All of the input arguments must be of the same lenght')
+        else:
+            if len(u.shape) == 1:
+                u = u.reshape(1,-1)
+                d = d.reshape(1,-1)
+        #Sigma definido por criterio de mediana
+        if self.sigma == None:
+            from scipy.spatial.distance import cdist
+       	    d_sgm = cdist(u,u)
+       	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
+        #TamaÃ±os u y d
+        N,D = u.shape
+        Nd,Dd = d.shape
+        
+        #Inicializaciones
+        y = []
+        if self.initialize:
+            self.CB.append(u[0,:]) #Codebook
+            self.a_coef.append(self.eta*d[0,:]) #Coeficientes
+            self.initialize = False
+            self.rho = 2*self.eta*self.mu
+            start = 1
+            y.append(0)
+            if u.shape[0] == 1:                
+                return
+        else:
+            start = 0      
+        from sklearn.metrics import mean_squared_error
+        self.mse = []
+        self.mse_ins = []
+        yt = []
+        err_ant = 0
+        
+        from tqdm import tqdm
+        # for i in tqdm(range(start,len(u))):
+        for i in range(start,len(u)):
+            ui = u[i]
+            di = d[i]           
+            yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
+            # self.__newEta(yi,err) #Nuevo eta
+            err = (di - yi).item() # Error
+            #Cuantizacion
+            min_index = np.argmin(disti)
+            
+            if disti[min_index] <= self.epsilon:
+              self.a_coef[min_index] =self.a_coef[min_index] + self.eta*err
+            else:
+              CB_ant = self.CB[-1]
+              CB = u[i,:]
+              # self.sigma += self.rho*err_ant*err* np.linalg.norm(CB-CB_ant)**2 * np.linalg.norm(CB-CB_ant)/self.sigma**3
+              self.sigma += self.rho*err_ant*err* np.linalg.norm(CB_ant-CB)**2 * np.exp(-(np.linalg.norm(CB_ant-CB)**2)/(2*self.sigma**2))/self.sigma**3
+              err_ant = err
+              self.CB.append(u[i,:])
+              self.a_coef.append(self.eta*err) 
+            self.sigma_n.append(self.sigma) 
+            self.CB_growth.append(len(self.CB)) #Crecimiento del diccionario 
+            y.append(yi.item())
+            yt.append(di.item())
+        return np.array(y)
+
+    def __output(self,ui):
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        dist = cdist(np.asarray(self.CB), ui)
+        K = np.exp(-0.5*(dist**2)/(self.sigma**2))
+        y = K.T.dot(np.asarray(self.a_coef))[0]
+        return [y,dist]
+    
+    def predict(self,u):
+        N,D = u.shape
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        y = []
+        # for i in tqdm(range(len(u))):
+        for i in range(len(u)):
+            ui = u[i]         
+            dist = cdist(np.asarray(self.CB), ui.reshape(1,-1))
+            K = np.exp(-0.5*(dist**2)/(self.sigma**2))            
+            y.append((K.T.dot(np.asarray(self.a_coef))).item())
+        return np.array(y)
+
+    def __newEta(self, y, errp):
+        # y: Salida calculada
+        # errp: Error a priori 
+        self.eta = (2*errp*y)/(errp**2 + 1)
+        return False
+    
+    def __
