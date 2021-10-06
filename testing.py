@@ -93,12 +93,12 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         results_tmse.append(TMSE) 
         results_cb.append(CB)
         
-        all_tmse = pd.DataFrame(data=results_tmse).T
-        tmse_cols = ["TMSE_{}".format(r) for r in range(run)]
-        all_tmse.columns = tmse_cols
-        all_cb = pd.DataFrame(data=results_cb).T
-        cb_cols = ["CB_{}".format(r) for r in range(run)]
-        all_cb.columns = cb_cols
+        tmse_cols = ["TMSE_{}".format(r) for r in range(len(results_tmse))]
+        all_tmse = pd.DataFrame(data=np.array(results_tmse).T,columns=tmse_cols)
+
+        cb_cols = ["CB_{}".format(r) for r in range(len(results_cb))]
+        all_cb = pd.DataFrame(data=np.array(results_cb).T,columns=cb_cols)
+        
         results = pd.concat([all_cb,all_tmse], axis=1)
         results['mean_CB'] = all_cb.mean(axis=1).values
         results['mean_TMSE'] = all_tmse.mean(axis=1).values
