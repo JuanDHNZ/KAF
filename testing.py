@@ -45,7 +45,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
            'epsilon':0.2,
            'sigma':np.sqrt(2)/2,
            #'mu':0.4,
-           #'K': 8
+           'K': 0
            }
     
     results_tmse = []     
@@ -65,7 +65,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         #X,y = Embedder(X=X_mc, embedding=5)
         
         train_portion=4000/4200
-        train_size = int(len(X)*train_portion)
+        train_size = int(len(X_mc)*train_portion)
         Xtrain,ytrain = X_mc[:train_size,:-1],X_mc[:train_size,-1]
         Xtest,ytest = X_mc[train_size:,:-1],X_mc[train_size:,-1]        
         #Xtrain, Xtest, ytrain, ytest = TrainTestSplit(X,y,train_portion=4000/4200)
