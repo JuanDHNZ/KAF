@@ -42,10 +42,10 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
     # params = best_params_picker(filt, params_df,criteria='CB_median')
     
     params = {'eta':0.1,
-           'epsilon':0.2,
-           'sigma':np.sqrt(2)/2,
-           #'mu':0.4,
-           'K': 0
+           'epsilon':0.4,
+           'sigma_init':0.35,
+           'mu':0.2,
+           'K': 4
            }
     
     results_tmse = []     
@@ -64,7 +64,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         # Xtest,ytest = Embedder(X=test, embedding=embedding)
         #X,y = Embedder(X=X_mc, embedding=5)
         
-        train_portion=4000/4200
+        train_portion=2000/2200
         train_size = int(len(X_mc)*train_portion)
         Xtrain,ytrain = X_mc[:train_size,:-1],X_mc[:train_size,-1]
         Xtest,ytest = X_mc[train_size:,:-1],X_mc[train_size:,-1]        
