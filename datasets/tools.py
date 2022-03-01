@@ -25,7 +25,7 @@ def mc_sampler(X, n_samples, mc_runs, embedding = 2):
     samples = np.arange(n_samples).reshape(1,-1,1)    
     mc = np.arange(0,len(X),n_samples+embedding+1)[:mc_runs].reshape(-1,1,1)
     
-    indices = mc+samples+embed    
+    indices = mc+samples+embed   
         
     return X[indices]
     
@@ -105,6 +105,8 @@ def KAF_picker(filt, params):
             kaf_filt = KAF.QKLMS_AMK(eta=params['eta'],epsilon=params['epsilon'], mu=params['mu'], Ka=params['K'], A_init="pca")
         elif filt == "QKLMS_AKS":
             kaf_filt = KAF.QKLMS_AKS(eta=params['eta'],epsilon=params['epsilon'], mu=params['mu'], sigma=params['sigma'])
+        elif filt == "QKLMS_MIPV":
+            kaf_filt = KAF.QKLMS_MIPV(eta=params['eta'],epsilon=params['epsilon'],sigma=params['sigma'])
         return kaf_filt
     except: 
         raise ValueError("Filter definition for {} failed".format(filt))
@@ -257,7 +259,15 @@ def noisy_chua_generator(n_samples, seed=None, alpha = None, beta = None, noise=
     test,_,_ = GenerateAttractor(samples=n_samples, attractor='chua', **dic2)
 
     return train, test, dic1, dic2
-    
+
+def noisy_chua_splited(n_samples, seed=None, alpha = None, beta = None, noise=True):
+    import random
+    var = 1
+    if seed == None:
+        seed = random.randint(0, 2000)
+    params = {'noise':noise, 'seed':seed, 'alpha':alpha, 'beta':beta, 'noise_var':var}
+    return GenerateAttractor(samples=n_samples, attractor='chua', **params)
+
     
 def MSE(y_true, y_pred):
     err = y_true-y_pred.reshape(-1,1)

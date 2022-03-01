@@ -9,7 +9,7 @@ Atractores obtenidos del repositorio https://github.com/capitanov/chaospy
 import numpy as np
 import matplotlib.pyplot as plt
 
-def chua(x=0, y=0, z=1, **kwargs):
+def chua(x=0, y=0, z=0, **kwargs):
     """
     Calculate the next coordinate X, Y, Z for Chua system.
 

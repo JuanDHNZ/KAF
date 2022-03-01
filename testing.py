@@ -16,7 +16,7 @@ from datasets.tools import *
 # models
 import KAF
 
-attractors = ["chua","lorenz","duffing","nose_hoover","rikitake","rossler","wang"]
+attractors = ["lorenz","duffing","nose_hoover","rikitake","rossler","wang"]
 nonlinears = ["4.1_AKB", "4.2_AKB"]
 
 def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, params_file, savepath):
@@ -42,16 +42,14 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
     # params = best_params_picker(filt, params_df,criteria='CB_median')
     
     params = {'eta':0.1,
-           'epsilon':0.4,
-           'sigma_init':0.35,
-           'mu':0.2,
-           'K': 4
+           'epsilon':1,
+           'sigma':1
            }
     
     results_tmse = []     
-    results_cb= []        
-
-                              
+    results_cb= []       
+    sigma_h = []
+                             
     # 4. Monte Carlo simulations
     print("Evualuations...")
     for run, X_mc in enumerate(system_mc):
@@ -64,7 +62,7 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         # Xtest,ytest = Embedder(X=test, embedding=embedding)
         #X,y = Embedder(X=X_mc, embedding=5)
         
-        train_portion=2000/2200
+        train_portion=4000/4200
         train_size = int(len(X_mc)*train_portion)
         Xtrain,ytrain = X_mc[:train_size,:-1],X_mc[:train_size,-1]
         Xtest,ytest = X_mc[train_size:,:-1],X_mc[train_size:,-1]        
@@ -75,12 +73,15 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
         TMSE = []
         CB = []
         
+        y_pred_train = []
+        
         if filt == "QKLMS_AMK":
             f.evaluate(Xtrain[:100],ytrain[:100])
 
         for n,(Xi,yi) in tqdm(enumerate(zip(Xtrain,ytrain))):
             try:
                 y = f.evaluate(Xi,yi)
+                y_pred_train.append(y)
                 if np.mod(n,pred_step)==0:
                     ypred = f.predict(Xtest)
                     err = ytest-ypred.reshape(ytest.shape)
@@ -90,19 +91,98 @@ def LearningCurveKAF_MC(filt, testingSystem, n_samples, mc_runs, pred_step, para
                 if np.mod(n,pred_step)==0:
                     TMSE.append(np.nan)
                     CB.append(np.nan)
+                
         results_tmse.append(TMSE) 
         results_cb.append(CB)
+        sigma_h.append(f.sigma_n)
+        
+        all_sigma = pd.DataFrame(data=sigma_h).T
+        all_sigma.to_csv(savepath + "sigmas_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
         
         tmse_cols = ["TMSE_{}".format(r) for r in range(len(results_tmse))]
         all_tmse = pd.DataFrame(data=np.array(results_tmse).T,columns=tmse_cols)
-
+        
         cb_cols = ["CB_{}".format(r) for r in range(len(results_cb))]
         all_cb = pd.DataFrame(data=np.array(results_cb).T,columns=cb_cols)
         
         results = pd.concat([all_cb,all_tmse], axis=1)
         results['mean_CB'] = all_cb.mean(axis=1).values
         results['mean_TMSE'] = all_tmse.mean(axis=1).values
-        results.to_csv(savepath + "tmse_{}_{}_{}_K_{}.csv".format(filt,testingSystem,n_samples,params['K']))
+        results.to_csv(savepath + "tmse3_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
+    return
+
+def LearningCurveKAF_MC_chua(filt, axis, testingSystem, n_samples, mc_runs, pred_step, params_file, savepath):
+    embedding = 5
+    # 1. Data generation
+    mc_samples = (n_samples+embedding)*(mc_runs + 1)
+    x,y,z = noisy_chua_splited(mc_samples, alpha=15.6, beta=28)
+    signal = {"x":x, "y":y, "z":z}
+    s = mc_sampler(signal[axis], n_samples, mc_runs, embedding=embedding)
+    
+    # 2. Parameters setting
+    params = {'eta':0.1,
+       'epsilon':0.3,
+       'sigma':0.45,
+       # 'mu':0.8,
+       # 'K':8
+       }
+    
+    results_tmse = []     
+    results_cb= []       
+    sigma_h = []
+                             
+    # 3. Monte Carlo simulations
+    print("Evualuations...")
+    for run, X in enumerate(s):
+        print("\nRunning Monte Carlo simulation #{}...\n".format(run+1))  
+        train_portion=2800/3000
+        train_size = int(len(X)*train_portion)
+        Xz = z_scorer(X)
+        Xtrain,ytrain = Xz[:train_size,:-1],Xz[:train_size,-1]
+        Xtest,ytest = Xz[train_size:,:-1],Xz[train_size:,-1]  
+        #Xtrain, Xtest, ytrain, ytest = TrainTestSplit(X,y,train_portion=4000/4200)
+        
+        f = KAF_picker(filt, params)
+        
+        TMSE = []
+        CB = []
+        
+        y_pred_train = []
+        
+        if filt == "QKLMS_AMK":
+            f.evaluate(Xtrain[:100],ytrain[:100])
+
+        for n,(Xi,yi) in tqdm(enumerate(zip(Xtrain,ytrain))):
+            try:
+                y = f.evaluate(Xi,yi)
+                y_pred_train.append(y)
+                if np.mod(n,pred_step)==0:
+                    ypred = f.predict(Xtest)
+                    err = ytest-ypred.reshape(ytest.shape)
+                    TMSE.append(np.mean(err**2))
+                    CB.append(len(f.CB))
+            except:
+                if np.mod(n,pred_step)==0:
+                    TMSE.append(np.nan)
+                    CB.append(np.nan)
+                
+        results_tmse.append(TMSE)
+        results_cb.append(CB)
+        
+        sigma_h.append(f.sigma_n)
+        all_sigma = pd.DataFrame(data=sigma_h).T
+        all_sigma.to_csv(savepath + "sigmas_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
+        
+        tmse_cols = ["TMSE_{}".format(r) for r in range(len(results_tmse))]
+        all_tmse = pd.DataFrame(data=np.array(results_tmse).T,columns=tmse_cols)
+        
+        cb_cols = ["CB_{}".format(r) for r in range(len(results_cb))]
+        all_cb = pd.DataFrame(data=np.array(results_cb).T,columns=cb_cols)
+        
+        results = pd.concat([all_cb,all_tmse], axis=1)
+        results['mean_CB'] = all_cb.mean(axis=1).values
+        results['mean_TMSE'] = all_tmse.mean(axis=1).values
+        results.to_csv(savepath + "tmse_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
     return
 
 def LearningCurveKAF_MC2(filt, testingSystem, n_samples, mc_runs, pred_step, params_file, savepath):
@@ -339,10 +419,17 @@ def LearningCurveKAF_MC4(filt, testingSystem, n_samples, mc_runs, pred_step, par
 
 def best_params_MonteCarlo_simulation(filt, testingSystem, n_samples, mc_runs, params_file, savepath): 
     # 1. parameter grid
-    params_df = pd.read_csv(params_file)
-    params = best_params_picker(filt, params_df,criteria='MAPE')       
+    # params_df = pd.read_csv(params_file)
+    # params = best_params_picker(filt, params_df,criteria='MAPE')
+    params = {'eta':0.1,
+       'epsilon':0.3,
+       'sigma':0.35
+       }
+    
+    params     
     embedding = 5
     
+    sigma_h = []
     TMAPE = []   
     TAPE = []
     CB =  []                    
@@ -368,6 +455,11 @@ def best_params_MonteCarlo_simulation(filt, testingSystem, n_samples, mc_runs, p
         except:
             TMAPE.append(np.nan)
             TAPE.append(np.nan)
+            
+        sigma_h.append(f.sigma_n)
+        
+    all_sigma = pd.DataFrame(data=sigma_h).T
+    all_sigma.to_csv(savepath + "sigmas_{}_{}_{}.csv".format(filt,testingSystem,n_samples))
         
     results = pd.DataFrame(data=TMAPE).T
     results_cols = ["MAPE_{}".format(run) for run in range(mc_runs)]

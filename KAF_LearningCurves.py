@@ -33,20 +33,29 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 #%% For testing only:
 
-kaf = "QKLMS_AKB"
-dataset = "4.2_AKB"    
-samples = 2200
-savepath = "results/4.2_oct7/"
+kaf = "QKLMS_MIPV"
+dataset = "chua"    
+samples = 3000
+savepath = "results/Chua/4.3_AKB/x/"
 params_file = "results/4.2v3/mc_QKLMS_4.2_AKB_5003.csv"
-mc_runs = 50
+mc_runs = 25
 pred_step = 5
 
 #%%
 def main():   
-    from testing import LearningCurveKAF_MC, learning_curve_train_error, LearningCurveKAF_MC2, LearningCurveKAF_MC3,LearningCurveKAF_MC4
+    from testing import LearningCurveKAF_MC, LearningCurveKAF_MC_chua, learning_curve_train_error, LearningCurveKAF_MC2, LearningCurveKAF_MC3,LearningCurveKAF_MC4,best_params_MonteCarlo_simulation
     
     print("Learning Curve Carlculation...")
-    LearningCurveKAF_MC(filt=kaf, 
+    # LearningCurveKAF_MC(filt=kaf, 
+    #                     testingSystem=dataset,
+    #                     n_samples=samples, 
+    #                     mc_runs=mc_runs, 
+    #                     pred_step=pred_step,
+    #                     params_file=params_file,
+    #                     savepath=savepath)
+    
+    LearningCurveKAF_MC_chua(filt=kaf, 
+                        axis="x",
                         testingSystem=dataset,
                         n_samples=samples, 
                         mc_runs=mc_runs, 

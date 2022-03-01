@@ -60,6 +60,7 @@ class BGMM_KLMS:
             self.__CB_cov_prods.append(np.zeros((D,D)))
             self.__n_cov.append(1)
             self.testCB_means.append(np.zeros(2,))#Prueba
+            self.CB_record = []
             #Salida           
             i = 1
             self.initialize = False
@@ -86,12 +87,13 @@ class BGMM_KLMS:
               self.CB_cov[min_index] = self.__naiveCovQ(min_index,u[i,:])
               self.__n_cov[min_index] = self.__n_cov[min_index] + 1
             else:
-              self.CB.append(u[i,:])
+              self.CB.append(ui)
               self.a_coef.append((self.eta*err).item())
               self.CB_cov.append(np.eye(D))
               self.__CB_cov_sums.append(np.zeros((D,)))
               self.__CB_cov_prods.append(np.zeros((D,D)))
               self.__n_cov.append(1)
+              self.CB_record.append([i,di])
               
               self.testCB_means.append(np.zeros(2,)) #Prueba
             
@@ -1304,6 +1306,7 @@ class QKLMS_AKB:
         self.epsilon = epsilon #Umbral de cuantizacion
         self.sigma = sigma_init #Sigma inicial
         self.sigma_n = [sigma_init]
+        self.sigma_record = []
         self.mu = mu #Step size de AKB
         self.K = K #Numero de AKB
         self.CB = [] #Codebook
@@ -1343,7 +1346,7 @@ class QKLMS_AKB:
             self.initialize = False
 
             if u.shape[0] == 1:
-                return [0]
+                return y
         else:
             start = 0
         from tqdm import tqdm
@@ -1375,6 +1378,7 @@ class QKLMS_AKB:
             # print("sigma = {} en iteracion {}".format(self.sigma,i))
             y.append(yi.item())
             self.mse.append(mean_squared_error(di,yi))
+            self.sigma_record.append(self.sigma)
         return np.array(y)
 
     def __output(self,ui):
@@ -1403,11 +1407,19 @@ class QKLMS_AKB:
         S = len(self.CB)
         dist = cdist(self.CB[S-self.K+i].reshape(1,-1), ui)
         K = np.exp(-0.5*(dist.item()**2)/(sigma**2))
+        
+        # print("\n")
+        # print("sigma_{}_{}".format(i,len(self.CB)))
+        # print("f1 = ",self.mu*error*self.a_coef[S-self.K+i])
+        # print("f2 = ",K)
+        # print("f3 = ",(dist.item()**2)/(sigma**3))
+        # print("\n")
+        
         return self.mu*error*self.a_coef[S-self.K+i]*K*(dist.item()**2)/(sigma**3)
     
     def __sigma_update(self,ui,e):
         self.sigma_n = [self.sigma_n[i] + self.__gu(e,i,ui) for i in range(self.K)]
-#        print('sigma_n',self.sigma_n)
+#       print('sigma_n',self.sigma_n)
         return
         
 
@@ -2511,4 +2523,390 @@ class LRKOL:
         self.eta = (2*errp*y)/(errp**2 + 1)
         return False
     
-#    def __
+
+
+class QKLMS_MIPV:
+    ##MAximization of Information Potential Variance for kernel bandwidth updating
+    """Álvarez-Meza A.M., Cárdenas-Peña D., Castellanos-Dominguez G. (2014) 
+    Unsupervised Kernel Function Building Using Maximization of Information 
+    Potential Variability. In: Bayro-Corrochano E., Hancock E. (eds) Progress
+    in Pattern Recognition, Image Analysis, Computer Vision, and Applications.
+    CIARP 2014. Lecture Notes in Computer Science, vol 8827. Springer, Cham. 
+    https://doi.org/10.1007/978-3-319-12568-8_41"""
+    
+    def __init__(self, eta=0.9, epsilon=10, sigma=None):
+        self.eta = eta #Remplazar por algun criterio
+        self.epsilon = epsilon
+        self.sigma = sigma
+        self.CB = [] #Codebook
+        self.a_coef = [] #Coeficientes
+        self.__CB_cov = [] #Covarianzas
+        self.__CB_cov_sums = [] #Sumas acumuladas
+        self.__CB_cov_prods = [] #Productos acumulados
+        self.__n_cov = [] # n iteraciones en covarianza
+        self.CB_growth = [] #Crecimiento del codebook por iteracion
+        self.sigma_n = []
+        self.initialize = True #Bandera de inicializacion   
+        self.evals = 0  #
+        
+        self.testCB_means = [] #Prueba
+        self.testDists = []
+        
+        self.sigma_n = []
+        self.var_px = []
+        
+    def evaluate(self, u , d):
+        import numpy as np
+        #ValidaciÃ³n d tamaÃ±os de entrada
+        if len(u.shape) == 2:
+            if u.shape[0]!=d.shape[0]:
+                raise ValueError('All of the input arguments must be of the same lenght')
+        else:
+            if len(u.shape) == 1:
+                u = u.reshape(1,-1)
+                d = d.reshape(1,-1)
+        #Sigma definido por criterio de mediana
+        if self.sigma == None:
+            from scipy.spatial.distance import cdist
+       	    d_sgm = cdist(u,u)
+       	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
+        #TamaÃ±os u y d
+        N,D = u.shape
+        Nd,Dd = d.shape
+        
+        #Inicializaciones
+        y = []
+        if self.initialize:
+            self.CB.append(u[0,:]) #Codebook
+            self.a_coef.append(self.eta*d[0,:]) #Coeficientes
+            self.initialize = False
+            # self.apriori_error = 0
+            start = 1
+            self.sigma_grid = np.logspace(-1,1,50)
+            y.append(0)
+            if u.shape[0] == 1:                
+                return
+        else:
+            start = 0      
+        from sklearn.metrics import mean_squared_error
+        self.mse = []
+        self.mse_ins = []
+        yt = []
+        from tqdm import tqdm
+        # for i in tqdm(range(start,len(u))):
+        for i in range(start,len(u)):
+            ui = u[i]
+            di = d[i]           
+            yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
+            # self.__newEta(yi,err) #Nuevo eta
+            err = (di - yi).item() # Error
+            self.apriori_error = err
+            #Cuantizacion
+            min_index = np.argmin(disti)
+            
+            if disti[min_index] <= self.epsilon:
+              self.a_coef[min_index] = self.a_coef[min_index] + self.eta*err
+            else:
+              self.CB.append(u[i,:])
+              self.__sigma_update()
+              self.a_coef.append(self.eta*err)             
+            self.CB_growth.append(len(self.CB)) #Crecimiento del diccionario
+            self.sigma_n.append(self.sigma)
+            y.append(yi.item())
+            yt.append(di.item())
+        return np.array(y)
+
+    def __output(self,ui):
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        dist = cdist(np.asarray(self.CB), ui)
+        K = np.exp(-0.5*(dist**2)/(self.sigma**2))
+        y = K.T.dot(np.asarray(self.a_coef))[0]
+        return [y,dist]
+    
+    def predict(self,u):
+        N,D = u.shape
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        y = []
+        # for i in tqdm(range(len(u))):
+        for i in range(len(u)):
+            ui = u[i]         
+            dist = cdist(np.asarray(self.CB), ui.reshape(1,-1))
+            K = np.exp(-0.5*(dist**2)/(self.sigma**2))            
+            y.append((K.T.dot(np.asarray(self.a_coef))).item())
+        return np.array(y)
+    
+    def __sigma_update(self):    
+        from scipy.spatial.distance import cdist
+        import numpy as np
+
+        X = np.array(self.CB)
+        kernel_rbf = lambda x,sigma: (2*np.pi*sigma**2)**(-X.shape[1]/2)*np.exp(-cdist(x,x)**2/(2*sigma**2))
+        var_px = lambda k: np.var(np.mean(k,axis=0))
+        
+        var_px_n = [var_px(kernel_rbf(X,s)) for s in self.sigma_grid]
+        self.sigma = self.sigma_grid[np.argmax(var_px_n)]
+        self.var_px.append(var_px_n)
+
+    def __newEta(self, y, errp):
+        # y: Salida calculada
+        # errp: Error a priori 
+        self.eta = (2*errp*y)/(errp**2 + 1)
+        return False
+    
+class QKLMS_varIP:
+    ##MAximization of Information Potential Variance for kernel bandwidth updating
+    """Álvarez-Meza A.M., Cárdenas-Peña D., Castellanos-Dominguez G. (2014) 
+    Unsupervised Kernel Function Building Using Maximization of Information 
+    Potential Variability. In: Bayro-Corrochano E., Hancock E. (eds) Progress
+    in Pattern Recognition, Image Analysis, Computer Vision, and Applications.
+    CIARP 2014. Lecture Notes in Computer Science, vol 8827. Springer, Cham. 
+    https://doi.org/10.1007/978-3-319-12568-8_41"""
+    
+    def __init__(self, eta=0.9, epsilon=10, sigma=None):
+        self.eta = eta 
+        self.epsilon = epsilon
+        self.sigma = sigma
+        
+        self.CB = [] #Codebook
+        self.a_coef = [] #Coeficientes
+        self.CB_growth = [] #Crecimiento del codebook por iteracion
+        self.sigma_n = [] #Historico de sigma
+        self.var_px = []
+        
+        self.initialize = True #Bandera de inicializacion
+
+    def evaluate(self, u , d):
+        import numpy as np
+        #ValidaciÃ³n d tamaÃ±os de entrada
+        if len(u.shape) == 2:
+            if u.shape[0]!=d.shape[0]:
+                raise ValueError('All of the input arguments must be of the same lenght')
+        else:
+            if len(u.shape) == 1:
+                u = u.reshape(1,-1)
+                d = d.reshape(1,-1)
+        #Sigma definido por criterio de mediana
+        if self.sigma == None:
+            from scipy.spatial.distance import cdist
+       	    d_sgm = cdist(u,u)
+       	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
+        #TamaÃ±os u y d
+        N,D = u.shape
+        Nd,Dd = d.shape
+        
+        #Inicializaciones
+        y = []
+        if self.initialize:
+            self.CB.append(u[0,:]) #Codebook
+            self.a_coef.append(self.eta*d[0,:]) #Coeficientes
+            self.initialize = False
+            # self.apriori_error = 0
+            start = 1
+            self.sigma_grid = np.logspace(-1,1,50)
+            y.append(0)
+            if u.shape[0] == 1:                
+                return
+        else:
+            start = 0      
+        from sklearn.metrics import mean_squared_error
+        self.mse = []
+        self.mse_ins = []
+        yt = []
+        from tqdm import tqdm
+        # for i in tqdm(range(start,len(u))):
+        for i in range(start,len(u)):
+            ui = u[i]
+            di = d[i]           
+            yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
+            # self.__newEta(yi,err) #Nuevo eta
+            err = (di - yi).item() # Error
+            self.apriori_error = err
+            #Cuantizacion
+            min_index = np.argmin(disti)
+            
+            if disti[min_index] <= self.epsilon:
+              self.a_coef[min_index] = self.a_coef[min_index] + self.eta*err
+            else:
+              self.CB.append(u[i,:])
+              self.__sigma_update()
+              self.a_coef.append(self.eta*err)             
+            self.CB_growth.append(len(self.CB)) #Crecimiento del diccionario
+            self.sigma_n.append(self.sigma)
+            y.append(yi.item())
+            yt.append(di.item())
+        return np.array(y)
+
+    def __output(self,ui):
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        dist = cdist(np.asarray(self.CB), ui)
+        K = np.exp(-0.5*(dist**2)/(self.sigma**2))
+        y = K.T.dot(np.asarray(self.a_coef))[0]
+        return [y,dist]
+    
+    def predict(self,u):
+        N,D = u.shape
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        y = []
+        # for i in tqdm(range(len(u))):
+        for i in range(len(u)):
+            ui = u[i]         
+            dist = cdist(np.asarray(self.CB), ui.reshape(1,-1))
+            K = np.exp(-0.5*(dist**2)/(self.sigma**2))            
+            y.append((K.T.dot(np.asarray(self.a_coef))).item())
+        return np.array(y)
+    
+    def __sigma_update(self):
+        import numpy as np
+        from scipy.optimize import minimize_scalar
+   
+        f = lambda sigma: self.__varIP(np.array(self.CB),sigma)
+        res = minimize_scalar(f, method='Bounded', bounds=[1e-5,1e2])
+        self.sigma = res.x
+        return
+    
+    def __varIP(self, X, sigma):
+        import numpy as np
+        from scipy.spatial.distance import cdist
+        kernel_rbf = lambda x,sigma: (2*np.pi*sigma**2)**(-X.shape[1]/2)*np.exp((-cdist(x,x)**2)/(2*sigma**2))
+        var_px = lambda k: np.var(np.mean(k,axis=0))
+        return -np.log(var_px(kernel_rbf(X,sigma)))
+
+            
+class QKLMS_varIP_FC:
+    ##MAximization of Information Potential Variance for kernel bandwidth updating
+    """Álvarez-Meza A.M., Cárdenas-Peña D., Castellanos-Dominguez G. (2014) 
+    Unsupervised Kernel Function Building Using Maximization of Information 
+    Potential Variability. In: Bayro-Corrochano E., Hancock E. (eds) Progress
+    in Pattern Recognition, Image Analysis, Computer Vision, and Applications.
+    CIARP 2014. Lecture Notes in Computer Science, vol 8827. Springer, Cham. 
+    https://doi.org/10.1007/978-3-319-12568-8_41"""
+    
+    def __init__(self, eta=0.9, epsilon=10, sigma=None, FC=10, bounds=[1e-5,1e2]):
+        self.eta = eta 
+        self.epsilon = epsilon
+        self.sigma = sigma
+        self.FC = FC
+        self.bounds = bounds
+        
+        self.CB = [] #Codebook
+        self.a_coef = [] #Coeficientes
+        self.CB_growth = [] #Crecimiento del codebook por iteracion
+        self.sigma_n = [] #Historico de sigma
+        self.var_px = []
+        
+        self.initialize = True #Bandera de inicializacion
+
+    def evaluate(self, u , d):
+        import numpy as np
+        #ValidaciÃ³n d tamaÃ±os de entrada
+        if len(u.shape) == 2:
+            if u.shape[0]!=d.shape[0]:
+                raise ValueError('All of the input arguments must be of the same lenght')
+        else:
+            if len(u.shape) == 1:
+                u = u.reshape(1,-1)
+                d = d.reshape(1,-1)
+        #Sigma definido por criterio de mediana
+        if self.sigma == None:
+            from scipy.spatial.distance import cdist
+       	    d_sgm = cdist(u,u)
+       	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
+        #TamaÃ±os u y d
+        N,D = u.shape
+        Nd,Dd = d.shape
+        
+        #Inicializaciones
+        y = []
+        if self.initialize:
+            self.CB.append(u[0,:]) #Codebook
+            self.a_coef.append(self.eta*d[0,:]) #Coeficientes
+            self.initialize = False
+            # self.apriori_error = 0
+            start = 1
+            self.sigma_grid = np.logspace(-1,1,50)
+            self.CB_record = []
+            y.append(0)
+            if u.shape[0] == 1:                
+                return
+        else:
+            start = 0      
+        from sklearn.metrics import mean_squared_error
+        self.mse = []
+        self.mse_ins = []
+        yt = []
+        from tqdm import tqdm
+        # for i in tqdm(range(start,len(u))):
+        for i in range(start,len(u)):
+            ui = u[i]
+            di = d[i]           
+            yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
+            # self.__newEta(yi,err) #Nuevo eta
+            err = (di - yi).item() # Error
+            self.apriori_error = err
+            #Cuantizacion
+            min_index = np.argmin(disti)
+            
+            if disti[min_index] <= self.epsilon:
+              self.a_coef[min_index] = self.a_coef[min_index] + self.eta*err
+            else:
+              self.CB.append(ui)
+              if len(self.CB) > 2:
+                  self.__sigma_update()
+              self.a_coef.append(self.eta*err)     
+              self.CB_record.append([i,di.item()])
+            self.CB_growth.append(len(self.CB)) #Crecimiento del diccionario
+            self.sigma_n.append(self.sigma)
+            y.append(yi.item())
+            yt.append(di.item())
+        return np.array(y)
+
+    def __output(self,ui):
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        dist = cdist(np.asarray(self.CB), ui)
+        K = np.exp(-0.5*(dist**2)/(self.sigma**2))
+        y = K.T.dot(np.asarray(self.a_coef))[0]
+        return [y,dist]
+    
+    def predict(self,u):
+        N,D = u.shape
+        from scipy.spatial.distance import cdist
+        import numpy as np
+        y = []
+        # for i in tqdm(range(len(u))):
+        for i in range(len(u)):
+            ui = u[i]         
+            dist = cdist(np.asarray(self.CB), ui.reshape(1,-1))
+            K = np.exp(-0.5*(dist**2)/(self.sigma**2))            
+            y.append((K.T.dot(np.asarray(self.a_coef))).item())
+        return np.array(y)
+    
+    def __sigma_update(self):
+        import numpy as np
+        from scipy.optimize import minimize_scalar
+    
+        try: 
+            Cb = np.array(self.CB)[:self.FC]
+        except:
+            Cb = np.array(self.CB)        
+        f = lambda sigma: self.__varIP(Cb,sigma)
+        res = minimize_scalar(f, method='Bounded', bounds=self.bounds)
+        self.sigma = res.x
+        # print(res.x)
+        return 
+    
+    def __varIP(self, X, sigma):
+        import numpy as np
+        from scipy.spatial.distance import cdist
+        #kernel_rbf = lambda x,sigma: (2*np.pi*sigma**2)**(-X.shape[1]/2)*np.exp((-cdist(x,x)**2)/(2*sigma**2))
+        kernel_rbf = lambda x,sigma: np.exp((-cdist(x,x)**2)/(2*sigma**2))
+        var_px = lambda k: np.var(np.mean(k,axis=0))
+        # print(kernel_rbf(X,sigma))
+        # print(var_px(kernel_rbf(X,sigma)))
+        # print(-np.log(var_px(kernel_rbf(X,sigma))))
+        # print()
+        return -np.log(var_px(kernel_rbf(X,sigma)))
