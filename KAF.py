@@ -1853,7 +1853,7 @@ class QKLMS_AMK:
                 self.CB.append(ui)
                 #self.a_coef.append(self.eta*e)                 
                 self.a_coef = np.hstack((self.a_coef,self.eta*e))
-                self.CB_growth.append(len(self.CB)) #Crecimiento del diccionario 
+            self.CB_growth.append(len(self.CB)) #Crecimiento del diccionario 
         return np.array(y)
 
     def output(self,ui):
