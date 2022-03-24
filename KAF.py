@@ -992,13 +992,9 @@ class QKLMS:
             from scipy.spatial.distance import cdist
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
-        #TamaÃ±os u y d
-        if len(u.shape) == 2:
-            N,D = u.shape
-            Nd,Dd = d.shape
-        if len(u.shape) == 3:
-            N,_,D = u.shape
-            Nd,Dd = d.shape
+
+        N,D = u.shape
+        Nd,Dd = d.shape
 
         #Inicializaciones
         y = []
