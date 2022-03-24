@@ -998,7 +998,7 @@ class QKLMS:
             Nd,Dd = d.shape
         if len(u.shape) == 3:
             N,_,D = u.shape
-            Nd,_,Dd = d.shape
+            Nd,Dd = d.shape
 
         #Inicializaciones
         y = []
