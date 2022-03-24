@@ -993,10 +993,13 @@ class QKLMS:
        	    d_sgm = cdist(u,u)
        	    self.sigma = np.median(d_sgm) #Criterio de la mediana      
         #TamaÃ±os u y d
-        # if len(u.shape) == 2:
-        #     N,D = u.shape
-        #     Nd,Dd = d.shape
-        
+        if len(u.shape) == 2:
+            N,D = u.shape
+            Nd,Dd = d.shape
+        if len(u.shape) == 3:
+            N,_,D = u.shape
+            Nd,_,Dd = d.shape
+
         #Inicializaciones
         y = []
         if self.initialize:
