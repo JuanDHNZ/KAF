@@ -111,18 +111,18 @@ def generateRandomVectorModel(samples):
     University of Electronic Science and Technology of China, Chengdu 610054, China
     """
     # Inicializar matrices para almacenar los valores de las funciones
-    x1 = np.zeros(num_muestras)
-    x2 = np.zeros(num_muestras)
-    y1 = np.zeros(num_muestras)
-    y2 = np.zeros(num_muestras)
-    z = np.zeros(num_muestras)
+    x1 = np.zeros(samples)
+    x2 = np.zeros(samples)
+    y1 = np.zeros(samples)
+    y2 = np.zeros(samples)
+    z = np.zeros(samples)
     
     # Generar ruido blanco gaussiano para cada función con varianza unitaria diferente
-    ruido_x1 = np.random.normal(0, 1, num_muestras)
-    ruido_x2 = np.random.normal(0, 1, num_muestras)
-    ruido_y1 = np.random.normal(0, 1, num_muestras)
-    ruido_y2 = np.random.normal(0, 1, num_muestras)
-    ruido_z = np.random.normal(0, 1, num_muestras)
+    ruido_x1 = np.random.normal(0, 1, samples)
+    ruido_x2 = np.random.normal(0, 1, samples)
+    ruido_y1 = np.random.normal(0, 1, samples)
+    ruido_y2 = np.random.normal(0, 1, samples)
+    ruido_z = np.random.normal(0, 1, samples)
     
     # Definir las ecuaciones como funciones lambda
     ecuacion_x1 = lambda t: -0.8 * x1[t-1] + 0.25 * np.sqrt(2) * x2[t-2] + 0.2 * ruido_x1[t]
@@ -132,7 +132,7 @@ def generateRandomVectorModel(samples):
     ecuacion_z = lambda t: 0.3 * np.tan(x1[t-1]) - 0.8 * np.cos(x2[t-1]) + 0.2 * ruido_z[t]
     
     # Evaluar las funciones para cada muestra de tiempo
-    for t in range(1, num_muestras):
+    for t in range(1, samples):
         # Evaluar las ecuaciones para cada función
         x1[t] = ecuacion_x1(t)
         x2[t] = ecuacion_x2(t)
