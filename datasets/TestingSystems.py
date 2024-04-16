@@ -102,5 +102,51 @@ def GenerateSystem(samples = 1000, systemType = None):
         return u,d
     
 
+def generateRandomVectorModel(samples):
+    """
+    Random Vector Model
+    Kernel canonical-correlation Granger causality for multiple time series
+    Guorong Wu, Xujun Duan, Wei Liao, Qing Gao, and Huafu Chen*
+    Key Laboratory for NeuroInformation of Ministry of Education, School of Life Science and Technology,
+    University of Electronic Science and Technology of China, Chengdu 610054, China
+    """
+    # Inicializar matrices para almacenar los valores de las funciones
+    x1 = np.zeros(num_muestras)
+    x2 = np.zeros(num_muestras)
+    y1 = np.zeros(num_muestras)
+    y2 = np.zeros(num_muestras)
+    z = np.zeros(num_muestras)
     
+    # Generar ruido blanco gaussiano para cada función con varianza unitaria diferente
+    ruido_x1 = np.random.normal(0, 1, num_muestras)
+    ruido_x2 = np.random.normal(0, 1, num_muestras)
+    ruido_y1 = np.random.normal(0, 1, num_muestras)
+    ruido_y2 = np.random.normal(0, 1, num_muestras)
+    ruido_z = np.random.normal(0, 1, num_muestras)
+    
+    # Definir las ecuaciones como funciones lambda
+    ecuacion_x1 = lambda t: -0.8 * x1[t-1] + 0.25 * np.sqrt(2) * x2[t-2] + 0.2 * ruido_x1[t]
+    ecuacion_x2 = lambda t: 0.75 * x1[t-1] * (1 - x2[t-2]) + 0.3 * ruido_x2[t]
+    ecuacion_y1 = lambda t: -0.4 * np.exp(-y1[t-1]) + 0.95 * z[t-1]**2 + 0.2 * ruido_y1[t]
+    ecuacion_y2 = lambda t: -0.75 * y1[t-1]**2 + 0.5 * y2[t-1] + 0.4 * ruido_y2[t]
+    ecuacion_z = lambda t: 0.3 * np.tan(x1[t-1]) - 0.8 * np.cos(x2[t-1]) + 0.2 * ruido_z[t]
+    
+    # Evaluar las funciones para cada muestra de tiempo
+    for t in range(1, num_muestras):
+        # Evaluar las ecuaciones para cada función
+        x1[t] = ecuacion_x1(t)
+        x2[t] = ecuacion_x2(t)
+        y1[t] = ecuacion_y1(t)
+        y2[t] = ecuacion_y2(t)
+        z[t] = ecuacion_z(t)
+    
+    # Retornar los valores de las funciones como una matriz
+    return np.array([x1, x2, y1, y2, z])
+
+if __name__ == "__main__":
+    # Ejemplo de uso
+    num_muestras = 10
+    valores_funciones = generateRandomVectorModel(num_muestras)
+    print(valores_funciones)
+
 
