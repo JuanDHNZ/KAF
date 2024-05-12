@@ -9,7 +9,7 @@ import matplotlib as mpl
 import tikzplotlib
 mpl.rcParams['figure.dpi'] = 300
 import KAF
-from KAF.datasets.ChaoticTimeSeries import GenerateAttractor
+# from KAF.datasets.ChaoticTimeSeries import GenerateAttractor
 
 """
 Make the embedding for KAF processing

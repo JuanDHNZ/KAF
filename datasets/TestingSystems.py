@@ -107,8 +107,9 @@ def generateRandomVectorModel(samples):
     Random Vector Model
     Kernel canonical-correlation Granger causality for multiple time series
     Guorong Wu, Xujun Duan, Wei Liao, Qing Gao, and Huafu Chen*
-    Key Laboratory for NeuroInformation of Ministry of Education, School of Life Science and Technology,
-    University of Electronic Science and Technology of China, Chengdu 610054, China
+    Key Laboratory for NeuroInformation of Ministry of Education, School of 
+    Life Science and Technology, University of Electronic Science and 
+    Technology of China, Chengdu 610054, China
     """
     # Inicializar matrices para almacenar los valores de las funciones
     x1 = np.zeros(samples)
@@ -143,10 +144,62 @@ def generateRandomVectorModel(samples):
     # Retornar los valores de las funciones como una matriz
     return np.array([x1, x2, y1, y2, z])
 
+
+def generateRandomVectorModel_v2(samples):
+    """
+    Random Vector Model - Model 1
+    
+    Sameshima K, Takahashi DY, Baccalá LA. On the statistical performance of 
+    Granger-causal connectivity estimators. Brain Inform. 2015 Jun;2(2):119-133. 
+    doi: 10.1007/s40708-015-0015-1. Epub 2015 Apr 22. PMID: 27747486; PMCID: PMC4883150.
+    
+    """
+    # Inicializar matrices para almacenar los valores de las funciones
+    x1 = np.zeros(samples)
+    x2 = np.zeros(samples)
+    x3 = np.zeros(samples)
+    x4 = np.zeros(samples)
+    x5 = np.zeros(samples)
+    x6 = np.zeros(samples)
+    x7 = np.zeros(samples)
+    
+    # Generar ruido blanco gaussiano para cada función
+    ruido_1 = np.random.normal(0, 1, samples)
+    ruido_2 = np.random.normal(0, 1, samples)
+    ruido_3 = np.random.normal(0, 1, samples)
+    ruido_4 = np.random.normal(0, 1, samples)
+    ruido_5 = np.random.normal(0, 1, samples)
+    ruido_6 = np.random.normal(0, 1, samples)
+    ruido_7 = np.random.normal(0, 1, samples)
+    
+    # Definir las ecuaciones como funciones lambda
+    ecuacion_x1 = lambda t: 0.95 * np.sqrt(2) * x1[t-1] - 0.9025 * x1[t-2] + 0.5 * x5[t-2] + ruido_1[t]
+    ecuacion_x2 = lambda t: -0.5 * x1[t-1] + ruido_2[t]
+    ecuacion_x3 = lambda t: 0.2 * x1[t-1] + 0.4 * x2[t-2] + ruido_3[t]
+    ecuacion_x4 = lambda t: -0.5 * x3[t-1] + 0.25 * np.sqrt(2) * x4[t-1] + 0.25 * np.sqrt(2) * x5[t-1] + ruido_4[t]
+    ecuacion_x5 = lambda t: -0.25 * np.sqrt(2) * x4[t-1] + 0.25 * np.sqrt(2) * x5[t-1] + ruido_5[t]
+    ecuacion_x6 = lambda t: 0.95 * np.sqrt(2) * x6[t-1] - 0.9025 * x6[t-2] + ruido_6[t]
+    ecuacion_x7 = lambda t: -0.1 * x6[t-2] + ruido_7[t]
+    
+    # Evaluar las funciones para cada muestra de tiempo
+    for t in range(2, samples):
+        # Evaluar las ecuaciones para cada función
+        x1[t] = ecuacion_x1(t)
+        x2[t] = ecuacion_x2(t)
+        x3[t] = ecuacion_x3(t)
+        x4[t] = ecuacion_x4(t)
+        x5[t] = ecuacion_x5(t)
+        x6[t] = ecuacion_x6(t)
+        x7[t] = ecuacion_x7(t)
+    
+    # Retornar los valores de las funciones como una matriz
+    return np.array([x1, x2, x3, x4, x5, x6, x7])
+
 if __name__ == "__main__":
     # Ejemplo de uso
     num_muestras = 10
-    valores_funciones = generateRandomVectorModel(num_muestras)
+    valores_funciones = generateRandomVectorModel_v2(num_muestras)
     print(valores_funciones)
+
 
 
