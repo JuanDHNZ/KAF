@@ -973,9 +973,9 @@ class QKLMS:
         self.CB_growth = [] #Crecimiento del codebook por iteracion
         self.initialize = True #Bandera de inicializacion   
         self.evals = 0  #
-        
         self.testCB_means = [] #Prueba
         self.testDists = []
+        self.e = []
         
     def evaluate(self, u , d):
         import numpy as np
@@ -1021,6 +1021,7 @@ class QKLMS:
             yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
             # self.__newEta(yi,err) #Nuevo eta
             err = (di - yi).item() # Error
+            self.e.append(err)
             self.apriori_error = err
             #Cuantizacion
             min_index = np.argmin(disti)
@@ -1317,6 +1318,7 @@ class QKLMS_AKB:
 
         self.testCB_means = [] #Prueba
         self.testDists = []
+        self.e = []
         
     def evaluate(self, u , d):
         import numpy as np
@@ -1359,6 +1361,7 @@ class QKLMS_AKB:
             
             yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
             err = (di - yi).item() # Error
+            self.e.append(err)
             min_index = np.argmin(disti)
             
             if disti[min_index] <= self.epsilon:
@@ -1781,6 +1784,7 @@ class QKLMS_AMK:
         self.At = []
         self.A_init = A_init
         self.scoring = False
+        self.e = []
         
     def evaluate(self, u , d):   
         # u,d = self.embedder(X,y)        
@@ -1825,6 +1829,7 @@ class QKLMS_AMK:
             di = d[i]
             yi,dis,K = self.output(ui.reshape(-1,D) ) #Salida             
             e = (di - yi).item() # Error
+            self.e.append(e)
             if np.any(np.isnan(yi)):
                 return 
             
@@ -2554,6 +2559,7 @@ class QKLMS_MIPV:
         
         self.sigma_n = []
         self.var_px = []
+        self.e = []
         
     def evaluate(self, u , d):
         import numpy as np
@@ -2600,6 +2606,7 @@ class QKLMS_MIPV:
             yi,disti = self.__output(ui.reshape(-1,D)) #Salida       
             # self.__newEta(yi,err) #Nuevo eta
             err = (di - yi).item() # Error
+            self.e.append(err)
             self.apriori_error = err
             #Cuantizacion
             min_index = np.argmin(disti)
@@ -2676,6 +2683,7 @@ class QKLMS_varIP:
         self.var_px = []
         
         self.initialize = True #Bandera de inicializacion
+        self.e = []
 
     def evaluate(self, u , d):
         import numpy as np
@@ -2723,6 +2731,7 @@ class QKLMS_varIP:
             # self.__newEta(yi,err) #Nuevo eta
             err = (di - yi).item() # Error
             self.apriori_error = err
+            self.e.append(err)
             #Cuantizacion
             min_index = np.argmin(disti)
             
@@ -2799,6 +2808,7 @@ class QKLMS_varIP_FC:
         self.var_px = []
         
         self.initialize = True #Bandera de inicializacion
+        self.e = []
 
     def evaluate(self, u , d):
         import numpy as np
@@ -2847,6 +2857,7 @@ class QKLMS_varIP_FC:
             # self.__newEta(yi,err) #Nuevo eta
             err = (di - yi).item() # Error
             self.apriori_error = err
+            self.e.append(err)
             #Cuantizacion
             min_index = np.argmin(disti)
             
